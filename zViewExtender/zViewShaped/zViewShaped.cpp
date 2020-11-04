@@ -102,7 +102,7 @@ namespace GOTHIC_ENGINE {
     if( Modified.GetNum() <= 2 )
       return False;
 
-    if( !BBox.IsOnBounds( zVEC2( x, y ) ) )
+    if( !BBox.IsOnBounds( zVEC2( (float)x, (float)y ) ) )
       return False;
 
     static zVEC2 tracerVector = zVEC2( 1000000.0f, 10.0f );

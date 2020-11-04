@@ -54,7 +54,7 @@ namespace NAMESPACE {
     void GetCursorPosition( int& px, int& py );
     void FrameBegin();
     void FrameEnd();
-    void Render();
+    void Render( bool blit = true );
     void Show();
     void ShowAt( int x, int y );
     void ShowAtCenter();

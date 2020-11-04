@@ -290,11 +290,16 @@ namespace NAMESPACE {
 
 
 
-  void zCViewCursor::Render() {
-    if( References == 0 )
+  void zCViewCursor::Render( bool blit ) {
+    if( References == 0 ) {
+      screen->RemoveItem( this );
       return;
+    }
 
-    screen->InsertItem( this );
+    if( blit )
+      ogame->viewport->InsertItem( this );
+
+    this->RemoveItem( GetActiveVisual() );
     this->InsertItem( GetActiveVisual() );
 
     SetSize(
@@ -305,10 +310,12 @@ namespace NAMESPACE {
     int ox, oy;
     GetActivePoint( ox, oy );
     SetPos( PosX - ox, PosY - oy );
-    GetActiveVisual()->Blit();
 
-    this->RemoveItem( GetActiveVisual() );
-    screen->RemoveItem( this );
+    if( blit ) {
+      GetActiveVisual()->Blit();
+      ogame->viewport->RemoveItem( this );
+      this->RemoveItem( GetActiveVisual() );
+    }
   }
 
 
@@ -403,17 +410,21 @@ namespace NAMESPACE {
 
 
 
+  inline zCViewCursor* CreateCursor() {
+    zCViewCursor* cursor = new zCViewCursor();
+
+    bool s_bInterfaceScaleEnabled;
+    Union.GetSysPackOption().Read( s_bInterfaceScaleEnabled, "INTERFACE", "Scale", false );
+    if( s_bInterfaceScaleEnabled )
+      s_nInterfaceScaleMultiplier = 2;
+
+    return cursor;
+  }
+
+
+
   zCViewCursor* zCViewCursor::GetCursor() {
-    static zCViewCursor* cursor = Null;
-    if( !cursor ) {
-      cursor = new zCViewCursor();
-
-      bool s_bInterfaceScaleEnabled;
-      Union.GetSysPackOption().Read( s_bInterfaceScaleEnabled, "INTERFACE", "Scale", false );
-      if( s_bInterfaceScaleEnabled )
-        s_nInterfaceScaleMultiplier = 2;
-    }
-
+    static zCViewCursor* cursor = CreateCursor();
     return cursor;
   }
 

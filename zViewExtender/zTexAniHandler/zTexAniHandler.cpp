@@ -220,8 +220,10 @@ namespace NAMESPACE {
           Enabled = False;
           return;
         }
+
         frame = 0;
       }
+
       SetCurrentFrame( frame );
     }
     else {
@@ -230,8 +232,10 @@ namespace NAMESPACE {
           Enabled = False;
           return;
         }
+
         frame = GetNumFrames() - 1;
       }
+
       SetCurrentFrame( frame );
     }
   }

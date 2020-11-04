@@ -67,14 +67,11 @@
     <Filter Include="Plugin\Workspace\Plugin\zRenderProcess">
       <UniqueIdentifier>{dffd853c-63aa-4ee8-97b4-df52f43a893c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Plugin\Workspace\Plugin\zView">
-      <UniqueIdentifier>{0d643d64-a90b-4782-be2c-81b12f0d42ed}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Plugin\Workspace\Plugin\zInventory">
-      <UniqueIdentifier>{4afbd72d-d88b-4dc4-a0f0-7d51113ff4b7}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Plugin\Workspace\Plugin\zViewShaped">
       <UniqueIdentifier>{2f349439-8819-428c-8943-fff193989b19}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Plugin\Workspace\Plugin\Overrides">
+      <UniqueIdentifier>{0d643d64-a90b-4782-be2c-81b12f0d42ed}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -2649,40 +2646,28 @@
       <Filter>Plugin\Workspace\Plugin\zViewAnimated</Filter>
     </ClInclude>
     <ClInclude Include="zView\zView.cpp">
-      <Filter>Plugin\Workspace\Plugin\zView</Filter>
-    </ClInclude>
-    <ClInclude Include="zTexAniHandler\zTexAniHandler.cpp">
-      <Filter>Plugin\Workspace\Plugin\zViewAnimated</Filter>
+      <Filter>Plugin\Workspace\Plugin\Overrides</Filter>
     </ClInclude>
     <ClInclude Include="zRenderProcess\zRenderProcess.cpp">
       <Filter>Plugin\Workspace\Plugin\zRenderProcess</Filter>
     </ClInclude>
     <ClInclude Include="zView\zDialogHandler.cpp">
-      <Filter>Plugin\Workspace\Plugin\zView</Filter>
+      <Filter>Plugin\Workspace\Plugin\Overrides</Filter>
     </ClInclude>
     <ClInclude Include="zView\zInventoryHandler.cpp">
-      <Filter>Plugin\Workspace\Plugin\zView</Filter>
+      <Filter>Plugin\Workspace\Plugin\Overrides</Filter>
     </ClInclude>
     <ClInclude Include="zView\zMenuHandler.cpp">
-      <Filter>Plugin\Workspace\Plugin\zView</Filter>
-    </ClInclude>
-    <ClInclude Include="zInventory\zInventory.h">
-      <Filter>Plugin\Workspace\Plugin\zInventory</Filter>
-    </ClInclude>
-    <ClInclude Include="zInventory\zInventory.cpp">
-      <Filter>Plugin\Workspace\Plugin\zInventory</Filter>
-    </ClInclude>
-    <ClInclude Include="zInventory\ItemPanel.cpp">
-      <Filter>Plugin\Workspace\Plugin\zInventory</Filter>
-    </ClInclude>
-    <ClInclude Include="zInventory\InventoryDrawFlag.cpp">
-      <Filter>Plugin\Workspace\Plugin\zInventory</Filter>
+      <Filter>Plugin\Workspace\Plugin\Overrides</Filter>
     </ClInclude>
     <ClInclude Include="zViewShaped\zViewShaped.h">
       <Filter>Plugin\Workspace\Plugin\zViewShaped</Filter>
     </ClInclude>
     <ClInclude Include="zViewShaped\zViewShaped.cpp">
       <Filter>Plugin\Workspace\Plugin\zViewShaped</Filter>
+    </ClInclude>
+    <ClInclude Include="zTexAniHandler\zTexAniHandler.cpp">
+      <Filter>Plugin\Workspace\Plugin\zTexAniHandler</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

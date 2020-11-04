@@ -462,22 +462,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="DllMain.cpp" />
-    <ClInclude Include="zInventory\InventoryDrawFlag.cpp">
-      <SubType>
-      </SubType>
-    </ClInclude>
-    <ClInclude Include="zInventory\ItemPanel.cpp">
-      <SubType>
-      </SubType>
-    </ClInclude>
-    <ClInclude Include="zInventory\zInventory.h">
-      <SubType>
-      </SubType>
-    </ClInclude>
-    <ClInclude Include="zInventory\zInventory.cpp">
-      <SubType>
-      </SubType>
-    </ClInclude>
     <ClInclude Include="zViewShaped\zViewShaped.h">
       <SubType>
       </SubType>

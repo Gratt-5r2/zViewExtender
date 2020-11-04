@@ -20,6 +20,7 @@ namespace NAMESPACE {
   }
 
   void Game_PreLoop() {
+    zCViewCursor::GetCursor()->FrameBegin();
   }
 
   void Game_Loop() {
@@ -43,6 +44,8 @@ namespace NAMESPACE {
   }
 
   void Game_PostLoop() {
+    zCViewCursor::GetCursor()->FrameEnd();
+    zCViewCursor::GetCursor()->Render();
   }
 
 
@@ -83,6 +86,18 @@ namespace NAMESPACE {
 
 
   void Game_MenuLoop() {
+
+    if( !player ) {
+      screen->RemoveItem( zCViewCursor::GetCursor() );
+      zCViewCursor::GetCursor()->FrameBegin();
+      zCViewCursor::GetCursor()->FrameEnd();
+
+      screen->InsertItem( zCViewCursor::GetCursor() );
+      zCViewCursor::GetCursor()->Render( false );
+    }
+
+    return;
+
     static zCViewShaped* viewShaped;
     static zCViewShaped* viewShaped2;
     static zCView* viewTest;
