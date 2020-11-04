@@ -3,3 +3,4 @@
 // User API for oCNpcContainer
 // Add your methods here
 
+int HandleEvent_Union( int key );

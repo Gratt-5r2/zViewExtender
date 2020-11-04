@@ -80,6 +80,7 @@ namespace Gothic_I_Classic {
     inline operator string()             { return ToChar(); }
     inline operator const string() const { return ToChar(); }
     inline operator const char*() const  { return ToChar(); }
+    inline int Length() const            { return length;   }
 
 #if USING_UNION_STRING_METHODS
 #if !UNPROTECT_ZSTRING_METHODS
@@ -124,10 +125,6 @@ namespace Gothic_I_Classic {
 #pragma region Get
     INLINE const char& operator[]( unsigned int index ) const {
       return vector[index];
-    }
-
-    INLINE int Length() const {
-      return length;
     }
 
     INLINE char& First() {
@@ -432,8 +429,8 @@ namespace Gothic_I_Classic {
     return zSTRING( s1 ) += s2;
   }
 
-  inline zSTRING& operator += ( const zSTRING& s1, const zSTRING& s2 ) {
-    return s1 += s2;
+  inline zSTRING& operator += ( zSTRING& s1, const zSTRING& s2 ) {
+    return s1.Put( s2, s1.Length() );
   }
 
   // case Insensitive

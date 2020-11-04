@@ -4,13 +4,21 @@
 #define __ZALGEBRA_H__VER3__
 
 namespace Gothic_II_Addon {
-  const double PI     = 3.14159265359;
-  const double RAD    = PI / 180.0f;
-  const double DEGREE = 180.0 / PI;
+  const double PI_LONG     = 3.14159265359;
+  const double RAD_LONG    = PI_LONG / 180.0f;
+  const double DEGREE_LONG = 180.0 / PI_LONG;
 
+  const float PI     = PI_LONG;
+  const float RAD    = RAD_LONG;
+  const float DEGREE = DEGREE_LONG;
+  const float RAD45  = 45.0f  / DEGREE;
   const float RAD90  = 90.0f  / DEGREE;
+  const float RAD135 = 135.0f / DEGREE;
   const float RAD180 = 180.0f / DEGREE;
+  const float RAD225 = 225.0f / DEGREE;
   const float RAD270 = 270.0f / DEGREE;
+  const float RAD315 = 315.0f / DEGREE;
+  const float RAD360 = 360.0f / DEGREE;
 
   const float AVERAGE_SMOOTH_FRAME_TIME = 0.025f;
 
@@ -172,6 +180,23 @@ namespace Gothic_II_Addon {
       return n[index];
     }
 
+    zVEC2 operator - () const {
+      zVEC2 v;
+      v[0] = -n[0];
+      v[1] = -n[1];
+      return v;
+    }
+
+    float GetAngle()
+    {
+      CalcAngle( n[0], n[1] );
+    }
+
+    zVEC2& Rotate( const float& rad )
+    {
+      RotAngle( n[0], n[1], );
+    }
+
     // user API
     #include "zVEC2.inl"
   };
@@ -206,6 +231,31 @@ namespace Gothic_II_Addon {
       n[0] = a0[0];
       n[1] = a0[1];
       n[2] = a0[2];
+    }
+
+    float LengthApprox() const {
+      float ix = n[VX];
+      float iy = n[VY];
+      float iz = n[VZ];
+
+      if( ix < 0.0f ) ix *= -1.0;
+      if( iy < 0.0f ) iy *= -1.0;
+      if( iz < 0.0f ) iz *= -1.0;
+
+      if( ix < iy ) {
+        float it = ix;
+        ix = iy;
+        iy = it;
+      }
+
+      if( ix < iz ) {
+        float it = ix;
+        ix = iz;
+        iz = it;
+      }
+
+      float t = iy + iz;
+      return ix - (ix * (1.0f / 16.0f)) + (t * (1.0f / 4.0f)) + (t * (1.0f / 8.0f));
     }
 
     float Length() const
@@ -320,6 +370,21 @@ namespace Gothic_II_Addon {
     const float& operator [] ( const uint32& index ) const
     {
       return n[index];
+    }
+
+    zVEC3 operator - () const {
+      zVEC3 v;
+      v[0] = -n[0];
+      v[1] = -n[1];
+      v[2] = -n[2];
+      return v;
+    }
+
+    operator zVEC2 () {
+      return zVEC2(
+        n[VX] / n[VZ],
+        n[VY] / n[VZ]
+        );
     }
 
     float GetAngleXZ() {
@@ -505,6 +570,15 @@ namespace Gothic_II_Addon {
       return n[index];
     }
 
+    zVEC4 operator - () const {
+      zVEC4 v;
+      v[0] = -n[0];
+      v[1] = -n[1];
+      v[2] = -n[2];
+      v[3] = -n[3];
+      return v;
+    }
+
     // user API
     #include "zVEC4.inl"
   };
@@ -565,37 +639,8 @@ namespace Gothic_II_Addon {
       v[2] = 0.0f;
     }
 
-    zMAT3 Transpose() const
-    {
-      return zMAT3(
-        zVEC3( v[0][0], v[1][0], v[2][0] ),
-        zVEC3( v[0][1], v[1][1], v[2][1] ),
-        zVEC3( v[0][2], v[1][2], v[2][2] ) );
-    }
-
-    zMAT3 Inverse( float* det = Null )
-    {
-      zVEC3 vec( 
-        v[VY][VY] * v[VZ][VZ] - v[VY][VZ] * v[VZ][VY],
-        v[VY][VZ] * v[VZ][VX] - v[VY][VX] * v[VZ][VZ],
-        v[VY][VX] * v[VZ][VY] - v[VY][VY] * v[VZ][VX] );
-      float dot = v->Dot( vec );
-      if( det )
-      {
-        *det = dot;
-      }
-      float div = 1.0f / dot;
-      return zMAT3(
-        zVEC3( vec[VX] * div,
-              ( v[VX][VZ] * v[VZ][VY] - v[VX][VY] * v[VZ][VZ] ) * div,
-              ( v[VX][VY] * v[VY][VZ] - v[VX][VZ] * v[VY][VY] ) * div ),
-        zVEC3( vec[VY] * div,
-              ( v[VX][VX] * v[VZ][VZ] - v[VX][VZ] * v[VZ][VX] ) * div,
-              ( v[VX][VZ] * v[VY][VX] - v[VX][VX] * v[VY][VZ] ) * div ),
-        zVEC3( vec[VZ] * div,
-              ( v[VX][VY] * v[VZ][VX] - v[VX][VX] * v[VZ][VY] ) * div,
-              ( v[VX][VX] * v[VY][VY] - v[VX][VY] * v[VY][VX] ) * div ) );
-    }
+    zMAT3 Transpose() const            zCall( 0x00513BD0 );
+    zMAT3 Inverse( float* det = Null ) zCall( 0x00513C60 );
 
     zVEC3 GetUpVector() const
     {
@@ -632,50 +677,74 @@ namespace Gothic_II_Addon {
       v[2][0] = a0.n[VZ];
     }
 
-    zMAT3& operator += ( const zMAT3& a0 )
+    zVEC2	GetTranslation() const
     {
-      v[0] += a0[0];
-      v[1] += a0[1];
-      v[2] += a0[2];
-      v[3] += a0[3];
+      return zVEC2( v[0][2], v[1][2] );
+    };
+
+    zMAT3& SetTranslation( zVEC2 const& a0 )
+    {
+      v[0][2] = a0[VX];
+      v[1][2] = a0[VY];
+      return *this;
+    };
+
+    zMAT3& Translate( zVEC2 const& a0 )
+    {
+      v[0][2] += a0[VX];
+      v[1][2] += a0[VY];
       return *this;
     }
 
-    zMAT3& operator -= ( const zMAT3& a0 )
-    {
-      v[0] -= a0[0];
-      v[1] -= a0[1];
-      v[2] -= a0[2];
-      v[3] -= a0[3];
-      return *this;
+    zVEC2 ExtractScaling() const {
+      return zVEC2(
+        sqrt( v[0][0] * v[0][0] + v[1][0] * v[1][0] ),
+        sqrt( v[0][1] * v[0][1] + v[1][1] * v[1][1] )
+      );
     }
 
-    zMAT3& operator *= ( const zMAT3& a0 )
-    {
-      v[0] *= a0[0];
-      v[1] *= a0[1];
-      v[2] *= a0[2];
-      v[3] *= a0[3];
-      return *this;
+    friend inline zMAT3 Alg_Scaling2D( zVEC2& );
+    friend inline zMAT3 Alg_Rotation2D( zVEC2&, float );
+    zMAT3 ExtractRotation() const {
+      float a = v[1][0] * v[1][0];
+      float b = v[1][1] * v[1][1];
+      float angle = atan( SafeDiv( a, b ) );
+      return Alg_Rotation2D( zVEC2( 0.0f ), angle * DEGREE );
     }
 
-    zMAT3& operator /= ( const zMAT3& a0 )
-    {
-      v[0] /= a0[0];
-      v[1] /= a0[1];
-      v[2] /= a0[2];
-      v[3] /= a0[3];
-      return *this;
+    float ExtractAngle() const {
+      float a     = v[1][0] * v[1][0];
+      float b     = v[1][1] * v[1][1];
+      float angle = atan( SafeDiv( a, b ) );
+
+      bool cs = v[1][1] < 0.0f;
+      bool sn = v[1][0] < 0.0f;
+
+      if( cs && sn ) return RAD180 + angle;
+      if( sn )       return RAD360 - angle;
+      if( cs )       return RAD180 - angle;
+                     return          angle;
     }
 
-    zMAT3& operator =  ( const zMAT3& a0 )
+    zMAT3& operator=( zMAT3 const& )  zCall( 0x00513A00 );
+    zMAT3& operator+=( zMAT3 const& ) zCall( 0x00513A50 );
+    zMAT3& operator-=( zMAT3 const& ) zCall( 0x00513AB0 );
+    zMAT3& operator*=( float )        zCall( 0x00513B10 );
+    zMAT3& operator/=( float )        zCall( 0x00513B70 );
+
+#define ROWCOL( i, j )    \
+  v[i][0] * other[0][j] + \
+  v[i][1] * other[1][j] + \
+  v[i][2] * other[2][j]
+
+    zMAT3& operator*=( zMAT3 const& other )
     {
-      v[0] = a0[0];
-      v[1] = a0[1];
-      v[2] = a0[2];
-      v[3] = a0[3];
+      v[0] = zVEC3( ROWCOL( 0, 0 ), ROWCOL( 0, 1 ), ROWCOL( 0, 2 ) );
+      v[1] = zVEC3( ROWCOL( 1, 0 ), ROWCOL( 1, 1 ), ROWCOL( 1, 2 ) );
+      v[2] = zVEC3( ROWCOL( 2, 0 ), ROWCOL( 2, 1 ), ROWCOL( 2, 2 ) );
       return *this;
     }
+#undef ROWCOL
 
     bool32 operator == ( const zMAT3& a0 ) const
     {
@@ -702,9 +771,11 @@ namespace Gothic_II_Addon {
       return zMAT3( *this ) *= a0;
     }
 
-    zMAT3  operator / ( const zMAT3& a0 ) const
-    {
-      return zMAT3( *this ) /= a0;
+    zMAT3& Test ( const zMAT3& a0 ) {
+      v[0] *= a0.v[0];
+      v[1] *= a0.v[1];
+      v[2] *= a0.v[2];
+      return *this;
     }
 
     zVEC3& operator [] ( const uint32& index )
@@ -715,6 +786,14 @@ namespace Gothic_II_Addon {
     const zVEC3& operator [] ( const uint32& index ) const
     {
       return v[index];
+    }
+
+    zVEC2 operator * ( const zVEC2& a0 ) {
+      return zVEC3(
+        v[0].n[VX] * a0.n[VX] + v[0].n[VY] * a0.n[VY] + v[0].n[VZ],
+        v[1].n[VX] * a0.n[VX] + v[1].n[VY] * a0.n[VY] + v[1].n[VZ],
+        v[2].n[VX] * a0.n[VX] + v[2].n[VY] * a0.n[VY] + v[2].n[VZ]
+        );
     }
 
     static zMAT3& s_identity;
@@ -918,11 +997,11 @@ namespace Gothic_II_Addon {
       return *this;
     }
 
-	#define ROWCOL( i, j )       \
-    self[i][0] * other[0][j] + \
-    self[i][1] * other[1][j] + \
-    self[i][2] * other[2][j] + \
-    self[i][3] * other[3][j]
+#define ROWCOL( i, j )       \
+  self[i][0] * other[0][j] + \
+  self[i][1] * other[1][j] + \
+  self[i][2] * other[2][j] + \
+  self[i][3] * other[3][j]
 
     zMAT4 operator * ( const zMAT4& other ) {
       zMAT4& self = *this;
@@ -933,6 +1012,7 @@ namespace Gothic_II_Addon {
         zVEC4( ROWCOL( 3, 0 ), ROWCOL( 3, 1 ), ROWCOL( 3, 2 ), ROWCOL( 3, 3 ) )
       );
     }
+#undef ROWCOL
 
     bool32 operator == ( const zMAT4& a0 ) const
     {
@@ -1335,6 +1415,148 @@ namespace Gothic_II_Addon {
 
     // user API
     #include "zCVEC3Smooth.inl"
+  };
+
+  inline void GetProjection( int& x, int& y, zVEC3 v );
+  inline int PixelToVirtualX( int x );
+  inline int PixelToVirtualY( int y );
+  inline int VirtualToPixelX( int x );
+  inline int VirtualToPixelY( int y );
+  extern oCGame*& ogame;
+
+  class zCLine2D {
+    zVEC2 posA;
+    zVEC2 posB;
+  public:
+
+    zCLine2D()
+    {
+
+    }
+
+    zCLine2D( zVEC2 a, zVEC2 b )
+    {
+      posA = a;
+      posB = b;
+    }
+
+    zCLine2D( zVEC3 a, zVEC3 b )
+    {
+      if( !ogame )
+        return;
+
+      int ax, ay, bx, by;
+      GetProjection( ax, ay, a );
+      GetProjection( bx, by, b );
+
+      posA = zVEC2( ax, ay );
+      posB = zVEC2( bx, by );
+    }
+
+    zVEC2& operator[] ( uint i )
+    {
+      return i == 0 ? posA : posB;
+    }
+
+    const zVEC2& operator[] ( uint i ) const
+    {
+      return i == 0 ? posA : posB;
+    }
+
+    zCLine2D Dot( float mult ) const
+    {
+      zVEC2 vector = GetVector() * mult;
+      return zCLine2D( posA, posA + vector );
+    }
+
+    bool TraceRay( const zCLine2D& line, zVEC2* intersec = Null ) const
+    {
+      zCLine2D lineSource = line;
+      zCLine2D line1      = *this;
+      zCLine2D line2      = line;
+
+      float sceneAngle = line1.GetAngle();
+      line1.Rotate( sceneAngle, line1[VA] );
+      line2.Rotate( sceneAngle, line1[VA] );
+
+      float vx_mid = line1[VA][VX];
+      if( line2[VA][VX] > line2[VB][VX] ) {
+        lineSource.InverseLinear();
+        line2.InverseLinear();
+      }
+
+      float vx_min = line2[VA][VX];
+      float vx_max = line2[VB][VX];
+
+      if( vx_mid >= vx_min && vx_mid <= vx_max ) {
+        float vx_length     = vx_max - vx_min;
+        float vx_distance   = vx_mid - vx_min;
+        float vx_multiplier = 1.0f / vx_length * vx_distance;
+
+        zCLine2D line3 = line2.Dot( vx_multiplier );
+
+        float vy_mid = line3[VB][VY];
+        float vy_min = min( line1[VA][VY], line1[VB][VY] );
+        float vy_max = max( line1[VA][VY], line1[VB][VY] );
+
+        if( vy_mid >= vy_min && vy_mid <= vy_max ) {
+          if( intersec )
+            *intersec = lineSource[VA] + lineSource.GetVector() * vx_multiplier;
+
+          return true;
+        }
+      }
+
+      return false;
+    }
+
+    bool TraceRay( const zVEC2& dot, float depth, zVEC2* intersec = Null ) const
+    {
+      zVEC2 vector = GetVector().Rotate( RAD90 ).Normalize() * zVEC2( PixelToVirtualX( depth ), PixelToVirtualY( depth ) );
+      zCLine2D line( dot - vector, dot + vector );
+      return TraceRay( line, intersec );
+    }
+
+    float GetAngle() const
+    {
+      zVEC2 vself = posB - posA;
+      return vself.GetAngle();
+    }
+
+    zCLine2D& Rotate( float angle )
+    {
+      return Rotate( angle, posA );
+    }
+
+    zCLine2D& Rotate( float angle, const zVEC2& pivot )
+    {
+      zVEC2 v1 = posA - pivot;
+      zVEC2 v2 = posB - pivot;
+
+      posA = pivot + v1.Rotate( angle );
+      posB = pivot + v2.Rotate( angle );
+      return *this;
+    }
+
+    zVEC2 GetVector() const
+    {
+      return posB - posA;
+    }
+
+    zCLine2D& InverseLinear() {
+      zVEC2 temp = posA;
+      posA       = posB;
+      posB       = temp;
+      return *this;
+    }
+
+    float GetLength() const
+    {
+      return GetVector().Length();
+    }
+
+    // user API
+    #include "zCLine2D.inl"
   };
   
   inline zVEC2 Alg_Min( zVEC2 const &, zVEC2 const & )               zCall( 0x00512FC0 );

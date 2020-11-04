@@ -52,6 +52,30 @@
     <Filter Include="Plugin\Workspace\Interface">
       <UniqueIdentifier>{e7225be9-bd30-470d-a48e-b1f831783398}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Plugin\Workspace\Plugin\zTexAniHandler">
+      <UniqueIdentifier>{53b19043-5d0b-4e93-b54f-5764bcdbcaab}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Plugin\Workspace\Plugin\zViewAnimated">
+      <UniqueIdentifier>{53f1c376-1285-4ab1-a16a-4acef55d64c9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Plugin\Workspace\Plugin\zViewCursor">
+      <UniqueIdentifier>{0c7fcd89-e539-41b8-a89b-272fcd11fec3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Plugin\Workspace\Plugin\zViewInteractive">
+      <UniqueIdentifier>{04e9ee32-597f-4d01-9b09-73658993e62c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Plugin\Workspace\Plugin\zRenderProcess">
+      <UniqueIdentifier>{dffd853c-63aa-4ee8-97b4-df52f43a893c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Plugin\Workspace\Plugin\zView">
+      <UniqueIdentifier>{0d643d64-a90b-4782-be2c-81b12f0d42ed}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Plugin\Workspace\Plugin\zInventory">
+      <UniqueIdentifier>{4afbd72d-d88b-4dc4-a0f0-7d51113ff4b7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Plugin\Workspace\Plugin\zViewShaped">
+      <UniqueIdentifier>{2f349439-8819-428c-8943-fff193989b19}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ZenGin\Gothic_I_Classic\staticDef_Ver0.cpp">
@@ -2602,6 +2626,63 @@
     </ClInclude>
     <ClInclude Include="UnionAfx.h">
       <Filter>Plugin\System</Filter>
+    </ClInclude>
+    <ClInclude Include="zViewInteractive\zViewInteractive.h">
+      <Filter>Plugin\Workspace\Plugin\zViewInteractive</Filter>
+    </ClInclude>
+    <ClInclude Include="zViewCursor\zViewCursor.h">
+      <Filter>Plugin\Workspace\Plugin\zViewCursor</Filter>
+    </ClInclude>
+    <ClInclude Include="zViewAnimated\zViewAnimated.h">
+      <Filter>Plugin\Workspace\Plugin\zViewAnimated</Filter>
+    </ClInclude>
+    <ClInclude Include="zTexAniHandler\zTexAniHandler.h">
+      <Filter>Plugin\Workspace\Plugin\zTexAniHandler</Filter>
+    </ClInclude>
+    <ClInclude Include="zViewInteractive\zViewInteractive.cpp">
+      <Filter>Plugin\Workspace\Plugin\zViewInteractive</Filter>
+    </ClInclude>
+    <ClInclude Include="zViewCursor\zViewCursor.cpp">
+      <Filter>Plugin\Workspace\Plugin\zViewCursor</Filter>
+    </ClInclude>
+    <ClInclude Include="zViewAnimated\zViewAnimated.cpp">
+      <Filter>Plugin\Workspace\Plugin\zViewAnimated</Filter>
+    </ClInclude>
+    <ClInclude Include="zView\zView.cpp">
+      <Filter>Plugin\Workspace\Plugin\zView</Filter>
+    </ClInclude>
+    <ClInclude Include="zTexAniHandler\zTexAniHandler.cpp">
+      <Filter>Plugin\Workspace\Plugin\zViewAnimated</Filter>
+    </ClInclude>
+    <ClInclude Include="zRenderProcess\zRenderProcess.cpp">
+      <Filter>Plugin\Workspace\Plugin\zRenderProcess</Filter>
+    </ClInclude>
+    <ClInclude Include="zView\zDialogHandler.cpp">
+      <Filter>Plugin\Workspace\Plugin\zView</Filter>
+    </ClInclude>
+    <ClInclude Include="zView\zInventoryHandler.cpp">
+      <Filter>Plugin\Workspace\Plugin\zView</Filter>
+    </ClInclude>
+    <ClInclude Include="zView\zMenuHandler.cpp">
+      <Filter>Plugin\Workspace\Plugin\zView</Filter>
+    </ClInclude>
+    <ClInclude Include="zInventory\zInventory.h">
+      <Filter>Plugin\Workspace\Plugin\zInventory</Filter>
+    </ClInclude>
+    <ClInclude Include="zInventory\zInventory.cpp">
+      <Filter>Plugin\Workspace\Plugin\zInventory</Filter>
+    </ClInclude>
+    <ClInclude Include="zInventory\ItemPanel.cpp">
+      <Filter>Plugin\Workspace\Plugin\zInventory</Filter>
+    </ClInclude>
+    <ClInclude Include="zInventory\InventoryDrawFlag.cpp">
+      <Filter>Plugin\Workspace\Plugin\zInventory</Filter>
+    </ClInclude>
+    <ClInclude Include="zViewShaped\zViewShaped.h">
+      <Filter>Plugin\Workspace\Plugin\zViewShaped</Filter>
+    </ClInclude>
+    <ClInclude Include="zViewShaped\zViewShaped.cpp">
+      <Filter>Plugin\Workspace\Plugin\zViewShaped</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

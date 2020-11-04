@@ -144,6 +144,12 @@ namespace Gothic_I_Classic {
     return CInvoke<T>( adr, ptr, flag );
   }
 
+  template <typename T>
+  inline ModulePatchCallInvoker<T> AutoModulePatchCallInvoker_BySignature( const string& sig, T ptr ) {
+    uint adr = FindEngineAddress( sig, typeid(ptr).name() );
+    return ModulePatchCallInvoker<T>( adr, ptr );
+  }
+
 } // namespace Gothic_II_Addon
 
 #endif // __ZGLOBAL_H__VER0__

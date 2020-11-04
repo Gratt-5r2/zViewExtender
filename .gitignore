@@ -259,3 +259,7 @@ paket-files/
 # Python Tools for Visual Studio (PTVS)
 __pycache__/
 *.pyc
+/zViewExtender/G1 Release
+/zViewExtender/G2A Release
+/zViewExtender.7z
+/zView_Extender.vdf.disabled

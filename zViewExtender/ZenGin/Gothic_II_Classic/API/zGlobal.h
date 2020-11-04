@@ -6,7 +6,7 @@
 namespace Gothic_II_Classic {
   extern zCEngine*&             zengine;
   extern zCOption*&             zoptions;
-  //                            zgameoptions;
+  extern zCOption*&             zgameoptions;
   extern zCTimer*               ztimer;
   extern oCGame*&               ogame;
   extern zCInput*&              zinput;
@@ -143,6 +143,12 @@ namespace Gothic_II_Classic {
   inline CInvoke<T> InvokeAuto_BySignature( const string& sig, T ptr, const uint32& flag = IVK_AUTO ) {
     uint adr = FindEngineAddress( sig, typeid( ptr ).name() );
     return CInvoke<T>( adr, ptr, flag );
+  }
+
+  template <typename T>
+  inline ModulePatchCallInvoker<T> AutoModulePatchCallInvoker_BySignature( const string& sig, T ptr ) {
+    uint adr = FindEngineAddress( sig, typeid(ptr).name() );
+    return ModulePatchCallInvoker<T>( adr, ptr );
   }
 
 } // namespace Gothic_II_Classic

@@ -5,6 +5,7 @@
 
 // Check executed engine with current source code
 #define CHECK_THIS_ENGINE (Union.GetEngineVersion() == ENGINE)
+#define GOTHIC_ENGINE NAMESPACE
 #define Engine_G1  1
 #define Engine_G1A 2
 #define Engine_G2  3
