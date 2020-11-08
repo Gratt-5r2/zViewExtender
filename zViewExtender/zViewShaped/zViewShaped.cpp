@@ -48,56 +48,6 @@ namespace GOTHIC_ENGINE {
 
 
 
-  zVEC2 zCViewShaped::PixelToVirtual( const zVEC2& point ) {
-    float pixelPosX   = (float)pposx;
-    float pixelPosY   = (float)pposy;
-    float pixelSizeX  = (float)psizex;
-    float pixelSizeY  = (float)psizey;
-    float offsetX     = point[VX] - pixelPosX;
-    float offsetY     = point[VY] - pixelPosY;
-    float virtualPosX = 8192.0f / pixelSizeX * offsetX;
-    float virtualPosY = 8192.0f / pixelSizeY * offsetY;
-
-    return zVEC2(
-      virtualPosX,
-      virtualPosY
-      );
-  }
-
-
-
-  zVEC2 zCViewShaped::VirtualToPixel( const zVEC2& point ) {
-    float pixelPosX   = (float)pposx;
-    float pixelPosY   = (float)pposy;
-    float pixelSizeX  = (float)psizex;
-    float pixelSizeY  = (float)psizey;
-    float pointMultiX = 1.0f / 8192.0f * point[VX];
-    float pointMultiY = 1.0f / 8192.0f * point[VY];
-    float pointPosX   = pixelSizeX * pointMultiX;
-    float pointPosY   = pixelSizeY * pointMultiY;
-
-    return zVEC2(
-      pixelPosX + pointPosX,
-      pixelPosY + pointPosY
-      );
-  }
-
-
-
-  zVEC2 zCViewShaped::GetVirtualScale() {
-    float xdim       = (float)zrenderer->vid_xdim;
-    float ydim       = (float)zrenderer->vid_ydim;
-    float pixelSizeX = (float)psizex;
-    float pixelSizeY = (float)psizey;
-
-    return zVEC2(
-      1.0f / xdim * pixelSizeX,
-      1.0f / ydim * pixelSizeY
-      );
-  }
-
-
-
   bool_t zCViewShaped::IsOnBounds( int x, int y ) {
     if( Modified.GetNum() <= 2 )
       return False;
@@ -259,6 +209,39 @@ namespace GOTHIC_ENGINE {
     zMAT3 postScale = trans * preScale * trans.Inverse();
     TrafoUV        *= rot * postScale * rot.Inverse();
   }
+
+
+
+  void zCViewShaped::RotateUVLocal( const float& angle, const zVEC2& pivot ) {
+    if( Vertexes.GetNum() <= 2 )
+      return;
+
+    zVEC2 uvPivot = pivot * s_SingleUV;
+    TrafoUV      *= Alg_Rotation2D( uvPivot, angle ).Inverse();
+  }
+
+
+
+  void zCViewShaped::MoveUVLocal( const zVEC2& direction ) {
+    if( Vertexes.GetNum() <= 2 )
+      return;
+
+    TrafoUV *= Alg_Translation2D( direction * s_SingleUV ).Inverse();
+  }
+
+
+
+  void zCViewShaped::ScaleUVLocal( const zVEC2& direction, const zVEC2& pivot, const float& angle ) {
+    if( Vertexes.GetNum() <= 2 )
+      return;
+
+    zVEC2 uvPivot   = pivot * s_SingleUV;
+    zMAT3 preScale  = Alg_Scaling2D( (zVEC2)direction ).Inverse();
+    zMAT3	trans     = Alg_Translation2D( uvPivot );
+    zMAT3	rot       = Alg_Rotation2D( uvPivot, angle );
+    zMAT3 postScale = trans * preScale * trans.Inverse();
+    TrafoUV        *= rot * postScale * rot.Inverse();
+  }
   
   
 
@@ -284,6 +267,10 @@ namespace GOTHIC_ENGINE {
     if( Vertexes.GetNum() <= 2 )
       return;
 
+    zTRnd_AlphaBlendFunc oldBlendFunc = zrenderer->GetAlphaBlendFunc();
+    zrenderer->SetAlphaBlendFunc( alphafunc );
+    color.alpha = alpha;
+
     if( Modified.GetNum() != Vertexes.GetNum() )
       Modified = Vertexes;
 
@@ -303,5 +290,12 @@ namespace GOTHIC_ENGINE {
     }
 
     zrenderer->DrawPolySimple( backTex, &VertexesVirtual[0], VertexesVirtual.GetNum() );
+    BlitText();
+    zrenderer->SetAlphaBlendFunc( oldBlendFunc );
+  }
+
+
+
+  zCViewShaped::~zCViewShaped() {
   }
 }

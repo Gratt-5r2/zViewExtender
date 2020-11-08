@@ -1,9 +1,10 @@
 
 namespace NAMESPACE {
 
-
-
-
+  CLogger& GetLog() {
+    static CLogger* logger = new CLogger( "Cursor.log" );
+    return *logger;
+  }
 
 
 
@@ -194,20 +195,18 @@ namespace NAMESPACE {
 
   void zCViewCursor::GetActivePoint( int& px, int& py ) {
     zCViewCursorVisual* visual = GetActiveVisual();
-    int ix = visual->ActivePointX * s_nInterfaceScaleMultiplier;
-    int iy = visual->ActivePointY * s_nInterfaceScaleMultiplier;
-    px = ix;
-    py = iy;
+    px = visual->ActivePointX;
+    py = visual->ActivePointY;
   }
 
 
 
   void zCViewCursor::GetActivePointPosition( int& px, int& py ) {
     zCViewCursorVisual* visual = GetActiveVisual();
-    int ix = visual->ActivePointX * s_nInterfaceScaleMultiplier;
-    int iy = visual->ActivePointY * s_nInterfaceScaleMultiplier;
-    px = PosX + ix;
-    py = PosY + iy;
+    zVEC2 viewScale            = GetVirtualScale();
+
+    px = PosX - (int)((float)(visual->ActivePointX) * viewScale[VX]);
+    py = PosY - (int)((float)(visual->ActivePointY) * viewScale[VY]);
   }
 
 
@@ -222,9 +221,6 @@ namespace NAMESPACE {
       return;
 
     UpdateInput();
-
-    // float sx = VID_MAX_XDIM;
-    // float sy = VID_MAX_YDIM;
 
     RECT clipCursor;
     GetClipCursor( &clipCursor );
@@ -251,7 +247,7 @@ namespace NAMESPACE {
   void zCViewCursor::FrameEnd() {
     if( References == 0 )
       return;
-    
+
     if( IsLeftPressed() || IsMiddlePressed() || IsRightPressed() )
       return;
        
@@ -271,8 +267,6 @@ namespace NAMESPACE {
       TopSelectedView = Null;
 
     bool_t isNewTop = oldTopView != TopSelectedView;
-    //if( isNewTop )
-    //cmd << isNewTop << tab << AHEX32( oldTopView ) << tab << AHEX32( TopSelectedView ) << endl;
 
     if( isNewTop ) {
       if( TopSelectedViewInteractive ) {
@@ -284,8 +278,6 @@ namespace NAMESPACE {
     if( isNewTop )
       if( TopSelectedViewInteractive )
         OnEnter();
-
-    
   }
 
 
@@ -308,13 +300,13 @@ namespace NAMESPACE {
       );
 
     int ox, oy;
-    GetActivePoint( ox, oy );
-    SetPos( PosX - ox, PosY - oy );
+    GetActivePointPosition( ox, oy );
+    SetPos( ox, oy );
 
     if( blit ) {
       GetActiveVisual()->Blit();
       ogame->viewport->RemoveItem( this );
-      this->RemoveItem( GetActiveVisual() );
+      RemoveItem( GetActiveVisual() );
     }
   }
 
@@ -366,7 +358,7 @@ namespace NAMESPACE {
     if( !s_visual ) {
       s_visual = new zCViewCursorVisual();
       s_visual->InsertBack( "UNIONDEFAULTCURSOR" );
-      s_visual->SetActivePoint( 3, 3 );
+      s_visual->SetActivePoint( 650, 650 );
     }
 
     return s_visual;

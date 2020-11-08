@@ -12,9 +12,6 @@
 #include "zView/zInventoryHandler.cpp"
 #include "zViewShaped\zViewShaped.cpp"
 #include "zView/zDialogHandler.cpp"
-#include "zInventory\ItemPanel.cpp"
-#include "zInventory\InventoryDrawFlag.cpp"
-#include "zInventory\zInventory.cpp"
 #include "Plugin.cpp"
 #pragma endregion
 

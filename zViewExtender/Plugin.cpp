@@ -24,7 +24,7 @@ namespace NAMESPACE {
   }
 
   void Game_Loop() {
-    InventoryTest();
+    //InventoryTest();
     /*auto& inv = player->inventory2;
     screen->Print( 1000, 1000, "selectedItem: " + A inv.selectedItem );
     screen->Print( 1000, 1100, "offset: " + A inv.offset );
@@ -69,7 +69,6 @@ namespace NAMESPACE {
   }
 
   bool BlueDrag( zCViewInteractive* button, zCViewCursor* cursor ) {
-    button3->InsertBack( "BLUE" );
     return true;
   }
 
@@ -87,16 +86,25 @@ namespace NAMESPACE {
 
   void Game_MenuLoop() {
 
+    if( !screen || !ogame || !ogame->viewport ) {
+      Message::Box( AHEX32( screen ) );
+      Message::Box( AHEX32( ogame ) );
+      Message::Box( AHEX32( ogame->viewport ) );
+    }
+
+
     if( !player ) {
+      //cmd << "a" << endl;
       screen->RemoveItem( zCViewCursor::GetCursor() );
       zCViewCursor::GetCursor()->FrameBegin();
       zCViewCursor::GetCursor()->FrameEnd();
 
       screen->InsertItem( zCViewCursor::GetCursor() );
       zCViewCursor::GetCursor()->Render( false );
+      //cmd << "b" << endl;
     }
 
-    return;
+    //return;
 
     static zCViewShaped* viewShaped;
     static zCViewShaped* viewShaped2;

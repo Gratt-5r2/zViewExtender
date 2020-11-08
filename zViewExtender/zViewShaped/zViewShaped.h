@@ -13,10 +13,7 @@ namespace GOTHIC_ENGINE {
 
     virtual bool_t IsOnBounds( int x, int y );
   public:
-    zVEC2 PixelToVirtual( const zVEC2& point );
-    zVEC2 VirtualToPixel( const zVEC2& point );
-    zVEC2 GetVirtualScale();
-    
+
     zCViewShaped();
     Array<zTRndSimpleVertex>& GetVertexes();
     void GetShapeBounds( zVEC2& min, zVEC2& max );
@@ -39,5 +36,6 @@ namespace GOTHIC_ENGINE {
     virtual void InsertVertex( const zVEC2& point );
     virtual void InsertVertex( const zVEC2& point, const zVEC2& uv );
     virtual void Blit();
+    virtual ~zCViewShaped();
   };
 }

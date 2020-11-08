@@ -7,7 +7,6 @@
 #include "zViewCursor/zViewCursor.h"
 #include "zViewInteractive/zViewInteractive.h"
 #include "zViewShaped\zViewShaped.h"
-#include "zInventory\zInventory.h"
 #include "Plugin.h"
 #pragma endregion
 
