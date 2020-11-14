@@ -21,11 +21,16 @@ namespace NAMESPACE {
   };
 
   class zCViewCursor : public zCView {
-    Array<zCViewCursorVisual*> arrBodies;
-    Array<zCView*> arrSelectedCollection;
+    friend class zCViewInteractive;
+    friend void Game_PreLoop();
+    friend void Game_PostLoop();
+    friend void Game_MenuLoop();
+
+  protected:
+    Array<zCViewCursorVisual*> Visuals;
+    Array<zCView*> SelectedCollection;
     zCView* TopSelectedView;
     zCViewInteractive* TopSelectedViewInteractive;
-    uint VisualIndex;
     int PosX;
     int PosY;
     uint References;
@@ -39,8 +44,18 @@ namespace NAMESPACE {
     void OnDown( zEMouseButton button );
     void OnDrag( int oldx, int oldy );
     void OnUp( zEMouseButton button );
+    void Collect( zCView* view );
+    void FrameBegin();
+    void FrameEnd();
+    void UpdateVisual();
+    void UpdateRect();
+    void Render( bool blit = true );
   public:
 
+    uint DefaultVisualIndex;
+    uint VisualIndex;
+
+  public:
     zCViewCursor();
     virtual ~zCViewCursor();
 
@@ -48,17 +63,14 @@ namespace NAMESPACE {
     void UpdateInput();
     void ClearInput();
     void ClearSelection();
-    void Collect( zCView* view );
     void GetActivePoint( int& px, int& py );
     void GetActivePointPosition( int& px, int& py );
     void GetCursorPosition( int& px, int& py );
-    void FrameBegin();
-    void FrameEnd();
-    void Render( bool blit = true );
     void Show();
     void ShowAt( int x, int y );
     void ShowAtCenter();
     void Hide();
+    uint CreateVisual( const zSTRING& texName, const zVEC2& activePoint, const int& aniFps = 0 );
     zCViewCursorVisual* GetActiveVisual();
     zCViewCursorVisual* GetDefaultVisual();
 

@@ -5,16 +5,15 @@ namespace NAMESPACE {
 
   class zCViewInteractive : public zCViewAnimated {
     friend class zCViewCursor;
-  protected:
-    bool_t Active;
+  public:
 
+    uint CursorVisualIndex;
     zTViewInteractiveEventMovement EventEnter;
     zTViewInteractiveEventMovement EventLeave;
     zTViewInteractiveEventToggled  EventDown;
     zTViewInteractiveEventMovement EventDrag;
     zTViewInteractiveEventToggled  EventUp;
     zTViewInteractiveEventMovement EventLoop;
-  public:
 
     zCViewInteractive();
     zCViewInteractive( int a0, int a1, int a2, int a3, zTviewID a4 = zTviewID::VIEW_ITEM );
@@ -28,8 +27,6 @@ namespace NAMESPACE {
       );
 
     bool_t IsSelected();
-    bool_t IsActive();
-
     virtual ~zCViewInteractive();
   };
 }

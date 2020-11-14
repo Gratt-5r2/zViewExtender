@@ -12,6 +12,7 @@
 #include "zView/zInventoryHandler.cpp"
 #include "zViewShaped\zViewShaped.cpp"
 #include "zView/zDialogHandler.cpp"
+#include "CursorTest.cpp"
 #include "Plugin.cpp"
 #pragma endregion
 

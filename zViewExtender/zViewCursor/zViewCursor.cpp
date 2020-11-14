@@ -1,11 +1,6 @@
 
 namespace NAMESPACE {
 
-  CLogger& GetLog() {
-    static CLogger* logger = new CLogger( "Cursor.log" );
-    return *logger;
-  }
-
 
 
   zCViewCursorVisual::zCViewCursorVisual() : zCViewAnimated( 0, 0, 8192, 8192 ) {
@@ -97,9 +92,10 @@ namespace NAMESPACE {
   zCViewCursor::zCViewCursor() : zCView() {
     TopSelectedView = Null;
     TopSelectedViewInteractive = Null;
-    VisualIndex = 0;
     References = 0;
     TopHandleView = Null;
+    DefaultVisualIndex = 0;
+    VisualIndex = 0;
   }
 
 
@@ -115,7 +111,7 @@ namespace NAMESPACE {
 
 
   Array<zCView*>& zCViewCursor::GetTopSelectedCollection() {
-    return arrSelectedCollection;
+    return SelectedCollection;
   }
 
 
@@ -177,7 +173,7 @@ namespace NAMESPACE {
       OnLeave();
       TopSelectedViewInteractive = Null;
     }
-    arrSelectedCollection.Clear();
+    SelectedCollection.Clear();
   }
 
 
@@ -186,7 +182,7 @@ namespace NAMESPACE {
     int x, y;
     GetActivePointPosition( x, y );
     if( view->IsOnBounds( x, y ) ) {
-      arrSelectedCollection += view;
+      SelectedCollection += view;
       TopSelectedView = view;
     }
   }
@@ -254,8 +250,8 @@ namespace NAMESPACE {
     // 
     zCView* oldTopView = TopSelectedView;
     
-    // Clear selected views
-    arrSelectedCollection.Clear();
+    // Pre-render cleaning
+    SelectedCollection.Clear();
     TopSelectedView = Null;
 
     TopSelectedView = GetTopHandleView()->GetTopView(
@@ -282,18 +278,56 @@ namespace NAMESPACE {
 
 
 
+  void zCViewCursor::UpdateVisual() {
+    if( TopSelectedViewInteractive && TopSelectedViewInteractive->CursorVisualIndex != Invalid ) {
+      if( VisualIndex != TopSelectedViewInteractive->CursorVisualIndex )
+        VisualIndex = TopSelectedViewInteractive->CursorVisualIndex;
+    }
+    else if( VisualIndex != DefaultVisualIndex )
+      VisualIndex = DefaultVisualIndex;
+  }
+
+
+
+  void zCViewCursor::UpdateRect() {
+    RECT rect;
+    GetWindowRect( hWndApp, &rect );
+    ClipCursor( &rect );
+  }
+
+
+
   void zCViewCursor::Render( bool blit ) {
     if( References == 0 ) {
       screen->RemoveItem( this );
       return;
     }
 
+    // Update cursor image and
+    // cursor movement range
+    UpdateVisual();
+    UpdateRect();
+
+    // Call loop function when the cursor is over an view interactive
+    if( TopSelectedViewInteractive && TopSelectedViewInteractive->EventLoop )
+      TopSelectedViewInteractive->EventLoop( TopSelectedViewInteractive, this );
+
+    // Place cursor in
+    // viewport before blit
     if( blit )
       ogame->viewport->InsertItem( this );
 
-    this->RemoveItem( GetActiveVisual() );
-    this->InsertItem( GetActiveVisual() );
+    // Remove old cursor picture and
+    // place new cursor picture
+    static zCViewCursorVisual* lastVisual = Null;
+    if( lastVisual )
+      RemoveItem( lastVisual );
 
+    lastVisual = GetActiveVisual();
+    InsertItem( lastVisual );
+
+    // Update cursor size and
+    // cursor picture position
     SetSize(
       zPixelX( 36 * s_nInterfaceScaleMultiplier ),
       zPixelY( 36 * s_nInterfaceScaleMultiplier )
@@ -303,11 +337,15 @@ namespace NAMESPACE {
     GetActivePointPosition( ox, oy );
     SetPos( ox, oy );
 
+    // Blit picture
     if( blit ) {
-      GetActiveVisual()->Blit();
+      lastVisual->Blit();
       ogame->viewport->RemoveItem( this );
-      RemoveItem( GetActiveVisual() );
+      RemoveItem( lastVisual );
     }
+
+    // Post-render cleaning
+    SelectedCollection.Clear();
   }
 
 
@@ -330,6 +368,8 @@ namespace NAMESPACE {
   void zCViewCursor::ShowAtCenter() {
     ShowAt( VID_MAX_XDIM / 2, VID_MAX_YDIM / 2 );
   }
+
+
   
   void zCViewCursor::Hide() {
     References--;
@@ -341,14 +381,33 @@ namespace NAMESPACE {
       ClearSelection();
     }
   }
+
+
+
+  uint zCViewCursor::CreateVisual( const zSTRING& texName, const zVEC2& activePoint, const int& aniFps ) {
+    GetDefaultVisual();
+
+    zCViewCursorVisual* visual = new zCViewCursorVisual();
+    visual->InsertBack( texName );
+    visual->SetActivePoint( activePoint[VX], activePoint[VY] );
+
+    if( aniFps ) {
+      visual->SetAnimationEnabled( True );
+      visual->SetFps( aniFps );
+    }
+
+    uint index = Visuals.GetNum();
+    Visuals += visual;
+    return index;
+  }
   
 
 
   zCViewCursorVisual* zCViewCursor::GetActiveVisual() {
-    if( VisualIndex >= arrBodies.GetNum() )
+    if( VisualIndex >= Visuals.GetNum() )
       return GetDefaultVisual();
 
-    return arrBodies[VisualIndex];
+    return Visuals[VisualIndex];
   }
   
 
@@ -359,6 +418,7 @@ namespace NAMESPACE {
       s_visual = new zCViewCursorVisual();
       s_visual->InsertBack( "UNIONDEFAULTCURSOR" );
       s_visual->SetActivePoint( 650, 650 );
+      Visuals += s_visual;
     }
 
     return s_visual;

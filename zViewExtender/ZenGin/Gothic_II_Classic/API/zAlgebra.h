@@ -632,37 +632,8 @@ namespace Gothic_II_Classic {
       v[2] = 0.0f;
     }
 
-    zMAT3 Transpose() const
-    {
-      return zMAT3(
-        zVEC3( v[0][0], v[1][0], v[2][0] ),
-        zVEC3( v[0][1], v[1][1], v[2][1] ),
-        zVEC3( v[0][2], v[1][2], v[2][2] ) );
-    }
-
-    zMAT3 Inverse( float* det = Null )
-    {
-      zVEC3 vec( 
-        v[VY][VY] * v[VZ][VZ] - v[VY][VZ] * v[VZ][VY],
-        v[VY][VZ] * v[VZ][VX] - v[VY][VX] * v[VZ][VZ],
-        v[VY][VX] * v[VZ][VY] - v[VY][VY] * v[VZ][VX] );
-      float dot = v->Dot( vec );
-      if( det )
-      {
-        *det = dot;
-      }
-      float div = 1.0f / dot;
-      return zMAT3(
-        zVEC3( vec[VX] * div,
-              ( v[VX][VZ] * v[VZ][VY] - v[VX][VY] * v[VZ][VZ] ) * div,
-              ( v[VX][VY] * v[VY][VZ] - v[VX][VZ] * v[VY][VY] ) * div ),
-        zVEC3( vec[VY] * div,
-              ( v[VX][VX] * v[VZ][VZ] - v[VX][VZ] * v[VZ][VX] ) * div,
-              ( v[VX][VZ] * v[VY][VX] - v[VX][VX] * v[VY][VZ] ) * div ),
-        zVEC3( vec[VZ] * div,
-              ( v[VX][VY] * v[VZ][VX] - v[VX][VX] * v[VZ][VY] ) * div,
-              ( v[VX][VX] * v[VY][VY] - v[VX][VY] * v[VY][VX] ) * div ) );
-    }
+    zMAT3 Transpose() const            zCall( 0x00510E00 );
+    zMAT3 Inverse( float* det = Null ) zCall( 0x00510E90 );
 
     zVEC3 GetUpVector() const
     {
@@ -678,6 +649,7 @@ namespace Gothic_II_Classic {
     {
       return zVEC3( v[0][2], v[1][2], v[2][2] );
     }
+    
     void SetUpVector( const zVEC3& a0 )
     {
       v[0][2] = a0.n[VX];
@@ -699,50 +671,74 @@ namespace Gothic_II_Classic {
       v[2][0] = a0.n[VZ];
     }
 
-    zMAT3& operator += ( const zMAT3& a0 )
+    zVEC2 GetTranslation() const
     {
-      v[0] += a0[0];
-      v[1] += a0[1];
-      v[2] += a0[2];
-      v[3] += a0[3];
+      return zVEC2( v[0][2], v[1][2] );
+    };
+
+    zMAT3& SetTranslation( zVEC2 const& a0 )
+    {
+      v[0][2] = a0[VX];
+      v[1][2] = a0[VY];
+      return *this;
+    };
+
+    zMAT3& Translate( zVEC2 const& a0 )
+    {
+      v[0][2] += a0[VX];
+      v[1][2] += a0[VY];
       return *this;
     }
 
-    zMAT3& operator -= ( const zMAT3& a0 )
-    {
-      v[0] -= a0[0];
-      v[1] -= a0[1];
-      v[2] -= a0[2];
-      v[3] -= a0[3];
-      return *this;
+    zVEC2 ExtractScaling() const {
+      return zVEC2(
+        sqrt( v[0][0] * v[0][0] + v[1][0] * v[1][0] ),
+        sqrt( v[0][1] * v[0][1] + v[1][1] * v[1][1] )
+      );
     }
 
-    zMAT3& operator *= ( const zMAT3& a0 )
-    {
-      v[0] *= a0[0];
-      v[1] *= a0[1];
-      v[2] *= a0[2];
-      v[3] *= a0[3];
-      return *this;
+    friend inline zMAT3 Alg_Scaling2D( zVEC2& );
+    friend inline zMAT3 Alg_Rotation2D( zVEC2&, float );
+    zMAT3 ExtractRotation() const {
+      float a = v[1][0] * v[1][0];
+      float b = v[1][1] * v[1][1];
+      float angle = atan( SafeDiv( a, b ) );
+      return Alg_Rotation2D( zVEC2( 0.0f ), angle * DEGREE );
     }
 
-    zMAT3& operator /= ( const zMAT3& a0 )
-    {
-      v[0] /= a0[0];
-      v[1] /= a0[1];
-      v[2] /= a0[2];
-      v[3] /= a0[3];
-      return *this;
+    float ExtractAngle() const {
+      float a     = v[1][0] * v[1][0];
+      float b     = v[1][1] * v[1][1];
+      float angle = atan( SafeDiv( a, b ) );
+
+      bool cs = v[1][1] < 0.0f;
+      bool sn = v[1][0] < 0.0f;
+
+      if( cs && sn ) return RAD180 + angle;
+      if( sn )       return RAD360 - angle;
+      if( cs )       return RAD180 - angle;
+                     return          angle;
     }
 
-    zMAT3& operator =  ( const zMAT3& a0 )
+    zMAT3& operator=( zMAT3 const& )  zCall( 0x00510C30 );
+    zMAT3& operator+=( zMAT3 const& ) zCall( 0x00510C80 );
+    zMAT3& operator-=( zMAT3 const& ) zCall( 0x00510CE0 );
+    zMAT3& operator*=( float )        zCall( 0x00510D40 );
+    zMAT3& operator/=( float )        zCall( 0x00510DA0 );
+
+#define ROWCOL( i, j )    \
+  v[i][0] * other[0][j] + \
+  v[i][1] * other[1][j] + \
+  v[i][2] * other[2][j]
+
+    zMAT3& operator*=( zMAT3 const& other )
     {
-      v[0] = a0[0];
-      v[1] = a0[1];
-      v[2] = a0[2];
-      v[3] = a0[3];
+      v[0] = zVEC3( ROWCOL( 0, 0 ), ROWCOL( 0, 1 ), ROWCOL( 0, 2 ) );
+      v[1] = zVEC3( ROWCOL( 1, 0 ), ROWCOL( 1, 1 ), ROWCOL( 1, 2 ) );
+      v[2] = zVEC3( ROWCOL( 2, 0 ), ROWCOL( 2, 1 ), ROWCOL( 2, 2 ) );
       return *this;
     }
+#undef ROWCOL
 
     bool32 operator == ( const zMAT3& a0 ) const
     {
@@ -764,14 +760,23 @@ namespace Gothic_II_Classic {
       return zMAT3( *this ) -= a0;
     }
 
+    operator zVEC2 () {
+      return zVEC2(
+        n[VX] / n[VZ],
+        n[VY] / n[VZ]
+        );
+    }
+
     zMAT3  operator * ( const zMAT3& a0 ) const
     {
       return zMAT3( *this ) *= a0;
     }
 
-    zMAT3  operator / ( const zMAT3& a0 ) const
-    {
-      return zMAT3( *this ) /= a0;
+    zMAT3& Test ( const zMAT3& a0 ) {
+      v[0] *= a0.v[0];
+      v[1] *= a0.v[1];
+      v[2] *= a0.v[2];
+      return *this;
     }
 
     zVEC3& operator [] ( const uint32& index )
@@ -784,7 +789,15 @@ namespace Gothic_II_Classic {
       return v[index];
     }
 
-     static zMAT3& s_identity;
+    zVEC2 operator * ( const zVEC2& a0 ) {
+      return zVEC3(
+        v[0].n[VX] * a0.n[VX] + v[0].n[VY] * a0.n[VY] + v[0].n[VZ],
+        v[1].n[VX] * a0.n[VX] + v[1].n[VY] * a0.n[VY] + v[1].n[VZ],
+        v[2].n[VX] * a0.n[VX] + v[2].n[VY] * a0.n[VY] + v[2].n[VZ]
+        );
+    }
+
+    static zMAT3& s_identity;
 
     // user API
     #include "zMAT3.inl"

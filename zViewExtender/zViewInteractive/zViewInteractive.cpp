@@ -7,6 +7,7 @@ namespace NAMESPACE {
     EventDrag  = Null;
     EventUp    = Null;
     EventLoop  = Null;
+    CursorVisualIndex = Invalid;
   }
 
   zCViewInteractive::zCViewInteractive( int a0, int a1, int a2, int a3, zTviewID a4 ) : zCViewAnimated( a0, a1, a2, a3, a4 ) {
@@ -16,6 +17,7 @@ namespace NAMESPACE {
     EventDrag  = Null;
     EventUp    = Null;
     EventLoop  = Null;
+    CursorVisualIndex = Invalid;
   }
 
   void zCViewInteractive::InitFunctions(
@@ -39,11 +41,11 @@ namespace NAMESPACE {
     return cursor && cursor->GetTopSelectedView() == this;
   }
 
-  bool_t zCViewInteractive::IsActive() {
-    return Active;
-  }
-
   zCViewInteractive::~zCViewInteractive() {
-    // TO DO remove from cursor view list
+    zCViewCursor* cur = zCViewCursor::GetCursor();
+    if( cur->SelectedCollection.HasEqual( this ) ) {
+      cur->SelectedCollection.Clear();
+      cur->SetTopHandleView( screen );
+    }
   }
 }

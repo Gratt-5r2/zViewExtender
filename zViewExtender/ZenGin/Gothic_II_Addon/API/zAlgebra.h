@@ -656,6 +656,7 @@ namespace Gothic_II_Addon {
     {
       return zVEC3( v[0][2], v[1][2], v[2][2] );
     }
+    
     void SetUpVector( const zVEC3& a0 )
     {
       v[0][2] = a0.n[VX];
@@ -677,7 +678,7 @@ namespace Gothic_II_Addon {
       v[2][0] = a0.n[VZ];
     }
 
-    zVEC2	GetTranslation() const
+    zVEC2 GetTranslation() const
     {
       return zVEC2( v[0][2], v[1][2] );
     };

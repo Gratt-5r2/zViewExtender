@@ -2669,6 +2669,9 @@
     <ClInclude Include="zTexAniHandler\zTexAniHandler.cpp">
       <Filter>Plugin\Workspace\Plugin\zTexAniHandler</Filter>
     </ClInclude>
+    <ClInclude Include="CursorTest.cpp">
+      <Filter>Plugin\Workspace\Plugin</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="ZenGin\Gothic_UserAPI\oCVob.inl">

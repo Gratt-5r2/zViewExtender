@@ -48,6 +48,14 @@ namespace GOTHIC_ENGINE {
 
 
 
+  zCViewShaped::zCViewShaped( int a0, int a1, int a2, int a3, zTviewID a4 ) : zCViewInteractive( a0, a1, a2, a3, a4 ) {
+    TrafoShape = Alg_Identity2D();
+    TrafoUV = Alg_Identity2D();
+    UseParentTrafo = True;
+  }
+
+
+
   bool_t zCViewShaped::IsOnBounds( int x, int y ) {
     if( Modified.GetNum() <= 2 )
       return False;

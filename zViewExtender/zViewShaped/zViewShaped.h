@@ -15,6 +15,7 @@ namespace GOTHIC_ENGINE {
   public:
 
     zCViewShaped();
+    zCViewShaped( int a0, int a1, int a2, int a3, zTviewID a4 = zTviewID::VIEW_ITEM );
     Array<zTRndSimpleVertex>& GetVertexes();
     void GetShapeBounds( zVEC2& min, zVEC2& max );
     void CreateFlatUV();
