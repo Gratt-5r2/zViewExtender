@@ -1,13 +1,13 @@
 
 namespace NAMESPACE {
-  HOOK Ivk_oCItemContainer_HandleEvent  AS( &oCItemContainer::HandleEvent,  &oCItemContainer::HandleEvent_Union );
-  HOOK Ivk_oCStealContainer_HandleEvent AS( &oCStealContainer::HandleEvent, &oCStealContainer::HandleEvent_Union );
-  HOOK Ivk_oCNpcContainer_HandleEvent   AS( &oCNpcContainer::HandleEvent,   &oCNpcContainer::HandleEvent_Union );
-  HOOK Ivk_oCNpcInventory_HandleEvent   AS( &oCNpcInventory::HandleEvent,   &oCNpcInventory::HandleEvent_Union );
-  HOOK Ivk_oCNpcInventory_OpenPassive   AS( &oCItemContainer::OpenPassive,  &oCItemContainer::OpenPassive_Union );
-  HOOK Ivk_oCNpcInventory_Close         AS( &oCItemContainer::Close,        &oCItemContainer::Close_Union );
-  HOOK Ivk_oCItemContainer_Draw         AS( &oCItemContainer::Draw,         &oCItemContainer::Draw_Union );
-  HOOK Ivk_oCItem_RenderItem            AS( &oCItem::RenderItem,            &oCItem::RenderItem_Union );
+  HOOK Ivk_oCItemContainer_HandleEvent  PATCH( &oCItemContainer::HandleEvent,  &oCItemContainer::HandleEvent_Union );
+  HOOK Ivk_oCStealContainer_HandleEvent PATCH( &oCStealContainer::HandleEvent, &oCStealContainer::HandleEvent_Union );
+  HOOK Ivk_oCNpcContainer_HandleEvent   PATCH( &oCNpcContainer::HandleEvent,   &oCNpcContainer::HandleEvent_Union );
+  HOOK Ivk_oCNpcInventory_HandleEvent   PATCH( &oCNpcInventory::HandleEvent,   &oCNpcInventory::HandleEvent_Union );
+  HOOK Ivk_oCNpcInventory_OpenPassive   PATCH( &oCItemContainer::OpenPassive,  &oCItemContainer::OpenPassive_Union );
+  HOOK Ivk_oCNpcInventory_Close         PATCH( &oCItemContainer::Close,        &oCItemContainer::Close_Union );
+  HOOK Ivk_oCItemContainer_Draw         PATCH( &oCItemContainer::Draw,         &oCItemContainer::Draw_Union );
+  HOOK Ivk_oCItem_RenderItem            PATCH( &oCItem::RenderItem,            &oCItem::RenderItem_Union );
 
 
 
@@ -16,7 +16,7 @@ namespace NAMESPACE {
   static bool_t s_itemSelected = False;
 
 
-
+#if 0
   // 0x004C3050 public: int __thiscall zCInput::IsBinded(unsigned short,unsigned short)
   int __fastcall zCInput_IsBinded( zCInput* _this, void* vt, DWORD g, DWORD k );
   CInvoke<int( __fastcall* )( zCInput* _this, void* vt, DWORD g, DWORD k )> Ivk_zCInput_IsBinded( 0x004C3050, &zCInput_IsBinded );
@@ -34,7 +34,7 @@ namespace NAMESPACE {
 
     return Ivk_zCInput_IsBinded( _this, vt, g, k );
   }
-
+#endif
 
 
 
@@ -42,7 +42,7 @@ namespace NAMESPACE {
   bool* keyevent = (bool*)ZenDef( 0x0086CCC8, 0x008B27C0, 0x008C3020, 0x008D1678 );
 
   int oCItemContainer::HandleEventBase_Union( int& key ) {
-    cmd << key << endl;
+    //cmd << key << endl;
 
     /*if( key == MOUSE_WHEELUP_G1 ) {
       zCArray<WORD> keys;
@@ -123,7 +123,7 @@ namespace NAMESPACE {
     if( oCItemContainer::HandleEventBase_Union( key ) )
       return True;
 
-    cmd << tab << key << endl;
+    //cmd << tab << key << endl;
     return THISCALL( Ivk_oCItemContainer_HandleEvent )( key );
   }
 
@@ -133,7 +133,7 @@ namespace NAMESPACE {
     if( oCItemContainer::HandleEventBase_Union( key ) )
       return True;
     
-    cmd << tab << key << endl;
+    //cmd << tab << key << endl;
     return THISCALL( Ivk_oCStealContainer_HandleEvent )( key );
   }
   
@@ -143,7 +143,7 @@ namespace NAMESPACE {
     if( oCItemContainer::HandleEventBase_Union( key ) )
       return True;
     
-    cmd << tab << key << endl;
+    //cmd << tab << key << endl;
     return THISCALL( Ivk_oCNpcContainer_HandleEvent )( key );
   }
   
@@ -153,7 +153,7 @@ namespace NAMESPACE {
     if( oCItemContainer::HandleEventBase_Union( key ) )
       return True;
     
-    cmd << tab << key << endl;
+    //cmd << tab << key << endl;
     return THISCALL( Ivk_oCNpcInventory_HandleEvent )( key );
   }
 

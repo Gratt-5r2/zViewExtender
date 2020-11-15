@@ -6,10 +6,10 @@ namespace NAMESPACE {
   //CInvoke<bool_t( __thiscall* )( zCViewDialogChoice*, int )> Ivk_zCViewDialogChoice_HandleEvent ( ZCVIEWDIALOGCHOICE_HANDLEEVENT, &zCViewDialogChoice::HandleEvent_Union, HOOK_ENABLED );
 
 #if 1
-  HOOK Ivk_zCViewDialogChoice_BlitText    AS( &zCViewDialogChoice::BlitText,       &zCViewDialogChoice::BlitText_Union );
-  HOOK Ivk_zCViewDialog_StartSelection    AS( &zCViewDialogChoice::StartSelection, &zCViewDialogChoice::StartSelection_Union );
-  HOOK Ivk_zCViewDialog_StopSelection     AS( &zCViewDialogChoice::StopSelection,  &zCViewDialogChoice::StopSelection_Union );
-  HOOK Ivk_zCViewDialogChoice_HandleEvent AS( &zCViewDialogChoice::HandleEvent,    &zCViewDialogChoice::HandleEvent_Union );
+  HOOK Ivk_zCViewDialogChoice_BlitText    PATCH( &zCViewDialogChoice::BlitText,       &zCViewDialogChoice::BlitText_Union );
+  HOOK Ivk_zCViewDialog_StartSelection    PATCH( &zCViewDialogChoice::StartSelection, &zCViewDialogChoice::StartSelection_Union );
+  HOOK Ivk_zCViewDialog_StopSelection     PATCH( &zCViewDialogChoice::StopSelection,  &zCViewDialogChoice::StopSelection_Union );
+  HOOK Ivk_zCViewDialogChoice_HandleEvent PATCH( &zCViewDialogChoice::HandleEvent,    &zCViewDialogChoice::HandleEvent_Union );
 
 
 

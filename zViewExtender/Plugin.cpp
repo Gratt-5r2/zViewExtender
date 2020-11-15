@@ -8,6 +8,43 @@ namespace NAMESPACE {
   // Your code ...
 
   void Game_Entry() {
+    PATCH_EXECUTE(
+      "MemSet(0x0064F1C7, '90', 0x0064F1F0 - 0x0064F1C7)"
+    );
+
+
+    bool enableInMenu = true;
+    Union.GetSysPackOption().Read( enableInMenu, "zViewExtender", "UseCursorInMenu", enableInMenu );
+    if( !enableInMenu ) {
+      Ivk_Menu_Render.Detach();
+      Ivk_Menu_HandleEvent.Detach();
+      Ivk_Menu_Enter.Detach();
+      Ivk_Menu_Leave.Detach();
+    }
+
+
+    bool enableInDialogs = true;
+    Union.GetSysPackOption().Read( enableInDialogs, "zViewExtender", "UseCursorInDialogs", enableInDialogs );
+    if( !enableInDialogs ) {
+      Ivk_zCViewDialogChoice_BlitText.Detach();
+      Ivk_zCViewDialog_StartSelection.Detach();
+      Ivk_zCViewDialog_StopSelection.Detach();
+      Ivk_zCViewDialogChoice_HandleEvent.Detach();
+    }
+
+
+    bool enableInInventory = true;
+    Union.GetSysPackOption().Read( enableInInventory, "zViewExtender", "UseCursorInInventory", enableInInventory );
+    if( !enableInInventory ) {
+      Ivk_oCItemContainer_HandleEvent.Detach();
+      Ivk_oCStealContainer_HandleEvent.Detach();
+      Ivk_oCNpcContainer_HandleEvent.Detach();
+      Ivk_oCNpcInventory_HandleEvent.Detach();
+      Ivk_oCNpcInventory_OpenPassive.Detach();
+      Ivk_oCNpcInventory_Close.Detach();
+      Ivk_oCItemContainer_Draw.Detach();
+      Ivk_oCItem_RenderItem.Detach();
+    }
   }
 
   void Game_Init() {
@@ -32,10 +69,10 @@ namespace NAMESPACE {
   }
 
   void Game_MenuLoop() {
-
+#if 0
     // Test program
     InitTest();
-
+#endif
     if( !player ) {
       screen->RemoveItem( zCViewCursor::GetCursor() );
       zCViewCursor::GetCursor()->FrameBegin();

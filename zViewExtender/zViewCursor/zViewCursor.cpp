@@ -290,9 +290,11 @@ namespace NAMESPACE {
 
 
   void zCViewCursor::UpdateRect() {
-    RECT rect;
-    GetWindowRect( hWndApp, &rect );
-    ClipCursor( &rect );
+    if( GetForegroundWindow() == hWndApp ) {
+      RECT rect;
+      GetWindowRect( hWndApp, &rect );
+      ClipCursor( &rect );
+    }
   }
 
 
@@ -416,8 +418,8 @@ namespace NAMESPACE {
     static zCViewCursorVisual* s_visual = Null;
     if( !s_visual ) {
       s_visual = new zCViewCursorVisual();
-      s_visual->InsertBack( "UNIONDEFAULTCURSOR" );
-      s_visual->SetActivePoint( 650, 650 );
+      s_visual->InsertBack( "UnionCursorDefault" );
+      s_visual->SetActivePoint( 100, 100 );
       Visuals += s_visual;
     }
 

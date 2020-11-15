@@ -1,9 +1,9 @@
 
 namespace NAMESPACE {
-  HOOK Ivk_Menu_Render      AS( &zCMenu::Render,      &zCMenu::Render_Union );
-  HOOK Ivk_Menu_HandleEvent AS( &zCMenu::HandleEvent, &zCMenu::HandleEvent_Union );
-  HOOK Ivk_Menu_Enter       AS( &zCMenu::ScreenInit,  &zCMenu::ScreenInit_Union );
-  HOOK Ivk_Menu_Leave       AS( &zCMenu::ScreenDone,  &zCMenu::ScreenDone_Union );
+  HOOK Ivk_Menu_Render      PATCH( &zCMenu::Render,      &zCMenu::Render_Union );
+  HOOK Ivk_Menu_HandleEvent PATCH( &zCMenu::HandleEvent, &zCMenu::HandleEvent_Union );
+  HOOK Ivk_Menu_Enter       PATCH( &zCMenu::ScreenInit,  &zCMenu::ScreenInit_Union );
+  HOOK Ivk_Menu_Leave       PATCH( &zCMenu::ScreenDone,  &zCMenu::ScreenDone_Union );
 
 
 
@@ -64,7 +64,7 @@ namespace NAMESPACE {
 
 
   int zCMenu::HandleEvent_Union( int key ) {
-    cmd << key << endl;
+    // cmd << key << endl;
 
     if( m_mainSel != -1 ) {
       zCViewCursor* cursor = zCViewCursor::GetCursor(); 
