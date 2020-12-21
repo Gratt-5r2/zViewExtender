@@ -3,11 +3,17 @@ namespace NAMESPACE {
   typedef bool( __cdecl* zTViewInteractiveEventMovement )( zCViewInteractive*, zCViewCursor* );
   typedef bool( __cdecl* zTViewInteractiveEventToggled )( zCViewInteractive*, zCViewCursor*, zEMouseButton );
 
-  class zCViewInteractive : public zCViewAnimated {
+  class VIEWAPI zCViewInteractive : public zCViewAnimated {
     friend class zCViewCursor;
-  public:
+  protected:
+    void DoLoopedEvent();
 
-    uint CursorVisualIndex;
+  public:
+    group {
+      uint CursorVisualIndex : 16;
+      bool_t Selectable : 16;
+    };
+
     zTViewInteractiveEventMovement EventEnter;
     zTViewInteractiveEventMovement EventLeave;
     zTViewInteractiveEventToggled  EventDown;
@@ -26,7 +32,9 @@ namespace NAMESPACE {
       zTViewInteractiveEventMovement loop
       );
 
+    void SetColor( const zCOLOR& color );
     bool_t IsSelected();
+    virtual void Blit();
     virtual ~zCViewInteractive();
   };
 }

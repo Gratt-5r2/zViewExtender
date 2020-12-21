@@ -73,6 +73,12 @@
     <Filter Include="Plugin\Workspace\Plugin\Overrides">
       <UniqueIdentifier>{0d643d64-a90b-4782-be2c-81b12f0d42ed}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Plugin\Workspace\Plugin\zViewNote">
+      <UniqueIdentifier>{fc7eff52-5bff-42b8-b874-90422c524659}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Plugin\Workspace\Plugin\zViewRenderer">
+      <UniqueIdentifier>{59969dc7-093f-4899-980c-29e92aae2144}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ZenGin\Gothic_I_Classic\staticDef_Ver0.cpp">
@@ -2671,6 +2677,18 @@
     </ClInclude>
     <ClInclude Include="CursorTest.cpp">
       <Filter>Plugin\Workspace\Plugin</Filter>
+    </ClInclude>
+    <ClInclude Include="zViewNote\zViewNote.cpp">
+      <Filter>Plugin\Workspace\Plugin\zViewNote</Filter>
+    </ClInclude>
+    <ClInclude Include="zViewNote\zViewNote.h">
+      <Filter>Plugin\Workspace\Plugin\zViewNote</Filter>
+    </ClInclude>
+    <ClInclude Include="zViewRenderer\zViewRenderer.h">
+      <Filter>Plugin\Workspace\Plugin\zViewRenderer</Filter>
+    </ClInclude>
+    <ClInclude Include="zViewRenderer\zViewRenderer.cpp">
+      <Filter>Plugin\Workspace\Plugin\zViewRenderer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

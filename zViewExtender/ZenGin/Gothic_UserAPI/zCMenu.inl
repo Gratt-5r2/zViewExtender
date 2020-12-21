@@ -7,3 +7,5 @@ void Render_Union();
 int HandleEvent_Union( int );
 void ScreenInit_Union();
 void ScreenDone_Union();
+void SelectItem();
+void Enter_Union();

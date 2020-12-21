@@ -1,6 +1,9 @@
 
 namespace NAMESPACE {
-  static Array<zCTexAniHandler*> arrTexAniHandlers;
+  static Array<zCTexAniHandler*>& GetTexAniHandlers() {
+    static Array<zCTexAniHandler*> TexAniHandlers;
+    return TexAniHandlers;
+  }
 
 
 
@@ -16,7 +19,7 @@ namespace NAMESPACE {
     Enabled        = False;
     EnabledOnPause = False;
     Paused         = False;
-    arrTexAniHandlers += this;
+    GetTexAniHandlers() += this;
   }
 
 
@@ -24,7 +27,7 @@ namespace NAMESPACE {
   zCTexAniHandler::~zCTexAniHandler() {
     ResetAnimation();
     RemoveTexture();
-    arrTexAniHandlers -= this;
+    GetTexAniHandlers() -= this;
   }
 
 
@@ -114,8 +117,11 @@ namespace NAMESPACE {
 
 
   void zCTexAniHandler::RemoveTexture() {
-    if( BaseTexture )
+    if( TargetTexture && BaseTexture ) {
       BaseTexture->Release();
+      TargetTexture = Null;
+      BaseTexture = Null;
+    }
   }
 
 
@@ -124,7 +130,7 @@ namespace NAMESPACE {
     RemoveTexture();
 
     TargetTexture = texture;
-    if( texture ) {
+    if( texture && *texture ) {
       BaseTexture = *texture;
       BaseTexture->AddRef();
     }
@@ -134,10 +140,30 @@ namespace NAMESPACE {
 
 
 
-  void zCTexAniHandler::SetCurrentFrame( int frame ) {
+  void zCTexAniHandler::SetCurrentFrame( int frame, bool considerReverse ) {
+    if( GetNumFrames() == 0 )
+      return;
+
+    if( Reversed && !considerReverse )
+      frame = GetNumFrames() - frame;
+
+    if( frame < 0 ) {
+      frame = Looped ?
+        GetNumFrames() - 1 :
+        0;
+    }
+    else if( frame >= GetNumFrames() ) {
+      frame = Looped ?
+        0 :
+        GetNumFrames() - 1;
+    }
+
     CurrentFrame = frame;
     if( HasTexture() ) {
       BaseTexture->actAniFrame[AniChannel] = frame;
+
+      // FIXME: Первый кадр (то бишь статический A0) может
+      // неправильно отображаться на любом zCView объекте.
       *TargetTexture = BaseTexture->GetAniTexture();
     }
   }

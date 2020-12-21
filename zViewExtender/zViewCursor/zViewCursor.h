@@ -7,8 +7,9 @@ namespace NAMESPACE {
   };
   
   class zCViewInteractive;
+  class zCViewNote;
 
-  class zCViewCursorVisual : public zCViewAnimated {
+  class VIEWAPI zCViewCursorVisual : public zCViewAnimated {
     friend class zCViewCursor;
   protected:
     int ActivePointX;
@@ -20,7 +21,7 @@ namespace NAMESPACE {
     void GetActivePoint( int& x, int& y );
   };
 
-  class zCViewCursor : public zCView {
+  class VIEWAPI zCViewCursor : public zCView {
     friend class zCViewInteractive;
     friend void Game_PreLoop();
     friend void Game_PostLoop();
@@ -31,13 +32,15 @@ namespace NAMESPACE {
     Array<zCView*> SelectedCollection;
     zCView* TopSelectedView;
     zCViewInteractive* TopSelectedViewInteractive;
+    zCViewNote* TopSelectedViewNote;
     int PosX;
     int PosY;
     uint References;
     bool_t LeftPressed,   LeftToggled;
     bool_t MiddlePressed, MiddleToggled;
     bool_t RightPressed,  RightToggled;
-    zCView** TopHandleView;
+    zCView** HandledView;
+    zCViewInteractive* DragObject;
 
     void OnEnter();
     void OnLeave();
@@ -75,13 +78,14 @@ namespace NAMESPACE {
     zCViewCursorVisual* GetDefaultVisual();
 
     //
-    void     SetTopHandleView( zCView*& view );
-    zCView*& GetTopHandleView();
-    void     ClearTopHandleView();
+    void     SetHandledView( zCView*& view );
+    zCView*& GetHandledView();
+    void     ClearHandledView();
 
 
     zCView* GetTopSelectedView();
     Array<zCView*>& GetTopSelectedCollection();
+    zCViewInteractive* GetDragObject();
 
     // left mouse button
     bool_t IsLeftPressed();

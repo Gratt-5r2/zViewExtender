@@ -1,6 +1,6 @@
 
 namespace NAMESPACE {
-  class zCTexAniHandler {
+  class VIEWAPI zCTexAniHandler {
     Timer FrameTimer;
     zCTexture* BaseTexture;
     zCTexture** TargetTexture;
@@ -36,7 +36,7 @@ namespace NAMESPACE {
 
     void RemoveTexture();
     void SetTexture( zCTexture** texture );
-    void SetCurrentFrame( int frame );
+    void SetCurrentFrame( int frame, bool considerReverse = true );
     void SetAniFps( int fps );
     void SetAniSpeed( int speed );
     void SetAniChannel( int channel );

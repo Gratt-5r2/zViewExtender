@@ -642,40 +642,26 @@ namespace Gothic_II_Addon {
     zMAT3 Transpose() const            zCall( 0x00513BD0 );
     zMAT3 Inverse( float* det = Null ) zCall( 0x00513C60 );
 
-    zVEC3 GetUpVector() const
+    zVEC2 GetUpVector() const
     {
-      return zVEC3( v[0][1], v[1][1], v[2][1] );
+      return zVEC2( v[0][1], v[1][1] );
     }
 
-    zVEC3 GetRightVector() const
+    zVEC2 GetRightVector() const
     {
-      return zVEC3( v[0][0], v[1][0], v[2][0] );
-    }
-
-    zVEC3 GetAtVector() const
-    {
-      return zVEC3( v[0][2], v[1][2], v[2][2] );
+      return zVEC2( v[0][0], v[1][0] );
     }
     
-    void SetUpVector( const zVEC3& a0 )
+    void SetUpVector( const zVEC2& a0 )
     {
       v[0][2] = a0.n[VX];
       v[1][2] = a0.n[VY];
-      v[2][2] = a0.n[VZ];
     }
 
-    void SetRightVector( const zVEC3& a0 )
+    void SetRightVector( const zVEC2& a0 )
     {
       v[0][1] = a0.n[VX];
       v[1][1] = a0.n[VY];
-      v[2][1] = a0.n[VZ];
-    }
-
-    void SetAtVector( const zVEC3& a0 )
-    {
-      v[0][0] = a0.n[VX];
-      v[1][0] = a0.n[VY];
-      v[2][0] = a0.n[VZ];
     }
 
     zVEC2 GetTranslation() const

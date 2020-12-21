@@ -331,12 +331,20 @@ namespace Gothic_II_Addon {
     }
 
     INLINE zSTRING& Put( const zSTRING& str, const uint32& idx ) {
-      this->Insert( idx, str );
+      if( idx >= Length() )
+        *this += str;
+      else
+        this->Insert( idx, str );
+
       return *this;
     }
 
     INLINE zSTRING& Put( const char* vec, const uint32& idx ) {
-      this->Insert( idx, vec );
+      if( idx >= Length() )
+        *this += vec;
+      else
+        this->Insert( idx, vec );
+
       return *this;
     }
 

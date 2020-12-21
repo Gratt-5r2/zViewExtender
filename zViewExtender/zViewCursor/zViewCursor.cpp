@@ -38,44 +38,73 @@ namespace NAMESPACE {
 
 
   void zCViewCursor::OnEnter() {
-    zCViewInteractive* topInter = TopSelectedViewInteractive;
-    if( topInter && topInter->EventEnter )
-      topInter->EventEnter( topInter, this );
+    if( TopSelectedViewInteractive && TopSelectedViewInteractive->EventEnter )
+      TopSelectedViewInteractive->EventEnter( TopSelectedViewInteractive, this );
   }
     
 
 
   void zCViewCursor::OnLeave() {
-    zCViewInteractive* topInter = TopSelectedViewInteractive;
-    if( topInter && topInter->EventLeave )
-      topInter->EventLeave( topInter, this );
+    if( TopSelectedViewInteractive && TopSelectedViewInteractive->EventLeave )
+      TopSelectedViewInteractive->EventLeave( TopSelectedViewInteractive, this );
   }
 
 
 
   void zCViewCursor::OnDown( zEMouseButton button ) {
-    zCViewInteractive* topInter = TopSelectedViewInteractive;
-    if( topInter && topInter->EventDown )
-      topInter->EventDown( topInter, this, button );
+    if( ActiveViewNote && ActiveViewNote != TopSelectedViewNote )
+      ActiveViewNote->EditEnd();
+
+    if( TopSelectedViewInteractive ) {
+      if( TopSelectedViewInteractive->EventDown )
+        TopSelectedViewInteractive->EventDown( TopSelectedViewInteractive, this, button );
+    }
+    else if( TopSelectedViewNote ) {
+      TopSelectedViewNote->EditBegin();
+
+      if( button == zBUTTON_LEFT ) {
+        int x, y;
+        GetCursorPosition( x, y );
+        TopSelectedViewNote->SetCaretPosition( x, y );
+      }
+    }
   }
 
 
 
   void zCViewCursor::OnDrag( int oldx, int oldy ) {
-    if( !IsLeftPressed() && !IsMiddlePressed() && !IsRightPressed() )
+    if( !IsLeftPressed() && !IsMiddlePressed() && !IsRightPressed() ) {
+      DragObject = Null;
+      return;
+    }
+
+    if( PosX == oldx && PosY == oldy )
       return;
 
     zCViewInteractive* topInter = TopSelectedViewInteractive;
-    if( topInter && topInter->EventDrag ) {
+    if( topInter ) {
+      if( topInter->EventDrag ) {
+        DragObject = topInter;
 
-      // move before calling for test
-      int movx = zAnx( topInter->owner, zNax( screen, PosX - oldx ) );
-      int movy = zAny( topInter->owner, zNay( screen, PosY - oldy ) );
-      topInter->Move( movx, movy );
+        // move before calling for test
+        int movx = zAnx( topInter->owner, zNax( screen, PosX - oldx ) );
+        int movy = zAny( topInter->owner, zNay( screen, PosY - oldy ) );
+        topInter->Move( movx, movy );
 
-      // restore position after cancel
-      if( !topInter->EventDrag( topInter, this ) )
-        topInter->Move( -movx, -movy );
+        // restore position after cancel
+        if( !topInter->EventDrag( topInter, this ) )
+          topInter->Move( -movx, -movy );
+      }
+
+      return;
+    }
+
+    if( IsLeftPressed() ) {
+      if( TopSelectedViewNote ) {
+        int x, y;
+        GetCursorPosition( x, y );
+        TopSelectedViewNote->SetCaretPosition( x, y, true );
+      }
     }
   }
 
@@ -92,8 +121,10 @@ namespace NAMESPACE {
   zCViewCursor::zCViewCursor() : zCView() {
     TopSelectedView = Null;
     TopSelectedViewInteractive = Null;
+    TopSelectedViewNote = Null;
+    DragObject = Null;
     References = 0;
-    TopHandleView = Null;
+    HandledView = Null;
     DefaultVisualIndex = 0;
     VisualIndex = 0;
   }
@@ -115,55 +146,85 @@ namespace NAMESPACE {
   }
 
 
+
+  zCViewInteractive* zCViewCursor::GetDragObject() {
+    return DragObject;
+  }
+
+
   
   void zCViewCursor::UpdateKeyStates() {
-    if( LeftPressed && !LeftToggled ) {
-      LeftToggled = True;
-      OnDown( zBUTTON_LEFT );
+    if( zMouseKeyPressed( Left ) ) {
+      if( !LeftPressed ) {
+        LeftPressed = True;
+        LeftToggled = True;
+        OnDown( zBUTTON_LEFT );
+      }
+      else if( LeftToggled )
+        LeftToggled = False;
+    }
+    else {
+      if( LeftPressed ) {
+        LeftPressed = False;
+        LeftToggled = False;
+        OnUp( zBUTTON_LEFT );
+      }
     }
 
-    if( MiddlePressed && !MiddleToggled ) {
-      MiddleToggled = True;
-      OnDown( zBUTTON_MIDDLE );
+    if( zMouseKeyPressed( Mid ) ) {
+      if( !MiddlePressed ) {
+        MiddlePressed = True;
+        MiddleToggled = True;
+        OnDown( zBUTTON_MIDDLE );
+      }
+      else if( MiddleToggled )
+        MiddleToggled = False;
+    }
+    else {
+      if( MiddlePressed ) {
+        MiddlePressed = False;
+        MiddleToggled = False;
+        OnUp( zBUTTON_MIDDLE );
+      }
     }
 
-    if( RightPressed && !RightToggled ) {
-      RightToggled = True;
-      OnDown( zBUTTON_RIGHT );
+    if( zMouseKeyPressed( Right ) ) {
+      if( !RightPressed ) {
+        RightPressed = True;
+        RightToggled = True;
+        OnDown( zBUTTON_RIGHT );
+      }
+      else if( RightToggled )
+        RightToggled = False;
     }
-
-    if( !LeftPressed && LeftToggled ) {
-      LeftToggled = False;
-      OnUp( zBUTTON_LEFT );
-    }
-
-    if( !MiddlePressed && MiddleToggled ) {
-      MiddleToggled = False;
-      OnUp( zBUTTON_MIDDLE );
-    }
-
-    if( !RightPressed && RightToggled ) {
-      RightToggled = False;
-      OnUp( zBUTTON_RIGHT );
+    else {
+      if( RightPressed ) {
+        RightPressed = False;
+        RightToggled = False;
+        OnUp( zBUTTON_RIGHT );
+      }
     }
   }
   
 
 
   void zCViewCursor::UpdateInput() {
-    LeftPressed   = zinput->GetMouseButtonPressedLeft();
-    MiddlePressed = zinput->GetMouseButtonPressedMid();
-    RightPressed  = zinput->GetMouseButtonPressedRight();
     UpdateKeyStates();
   }
 
 
 
   void zCViewCursor::ClearInput() {
+    if( LeftPressed )   OnUp( zBUTTON_LEFT );
+    if( MiddlePressed ) OnUp( zBUTTON_MIDDLE );
+    if( RightPressed )  OnUp( zBUTTON_RIGHT );
+
     LeftPressed   = False;
+    LeftToggled   = False;
     MiddlePressed = False;
+    MiddleToggled = False;
     RightPressed  = False;
-    UpdateKeyStates();
+    RightToggled  = False;
   }
 
 
@@ -173,6 +234,13 @@ namespace NAMESPACE {
       OnLeave();
       TopSelectedViewInteractive = Null;
     }
+
+    if( TopSelectedViewNote ) {
+      TopSelectedViewNote->EditEnd();
+      TopSelectedViewNote = Null;
+    }
+
+    TopSelectedView = Null;
     SelectedCollection.Clear();
   }
 
@@ -232,8 +300,7 @@ namespace NAMESPACE {
     PosX = int( 8192.0f / sx * float( realCursorPos.x - clipCursor.left ) );
     PosY = int( 8192.0f / sy * float( realCursorPos.y - clipCursor.top  ) );
 
-    if( PosX != nOldPosX || PosY != nOldPosY )
-      OnDrag( nOldPosX, nOldPosY );
+    OnDrag( nOldPosX, nOldPosY );
 
     // ...
   }
@@ -254,7 +321,42 @@ namespace NAMESPACE {
     SelectedCollection.Clear();
     TopSelectedView = Null;
 
-    TopSelectedView = GetTopHandleView()->GetTopView(
+    Array<zCView*> selectedViews = GetHandledView()->GetTopViewList(
+      screen->nax( PosX ),
+      screen->nay( PosY )
+      );
+
+    uint index      = selectedViews.GetNum() - 1;
+    TopSelectedView = Null;
+
+    while( index != Invalid ) {
+      TopSelectedView = selectedViews[index] != screen ?
+        selectedViews[index] :
+        Null;
+
+      zCViewInteractive* inter = dynamic_cast<zCViewInteractive*>(TopSelectedView);
+      if( !inter || inter->Selectable )
+        break;
+
+      index--;
+    }
+
+    bool isNewTop = oldTopView != TopSelectedView;
+    if( isNewTop )
+      if( TopSelectedViewInteractive )
+        OnLeave();
+
+    TopSelectedViewInteractive = dynamic_cast<zCViewInteractive*>(TopSelectedView);
+    TopSelectedViewNote = dynamic_cast<zCViewNote*>(TopSelectedView);
+    if( isNewTop )
+      if( TopSelectedViewInteractive )
+        OnEnter();
+
+
+
+
+#if 0
+    TopSelectedView = GetHandledView()->GetTopView(
       screen->nax( PosX ),
       screen->nay( PosY )
       );
@@ -264,16 +366,16 @@ namespace NAMESPACE {
 
     bool_t isNewTop = oldTopView != TopSelectedView;
 
-    if( isNewTop ) {
-      if( TopSelectedViewInteractive ) {
+    if( isNewTop )
+      if( TopSelectedViewInteractive )
         OnLeave();
-      }
-    }
 
     TopSelectedViewInteractive = dynamic_cast<zCViewInteractive*>( TopSelectedView );
+    TopSelectedViewNote = dynamic_cast<zCViewNote*>( TopSelectedView );
     if( isNewTop )
       if( TopSelectedViewInteractive )
         OnEnter();
+#endif
   }
 
 
@@ -282,8 +384,16 @@ namespace NAMESPACE {
     if( TopSelectedViewInteractive && TopSelectedViewInteractive->CursorVisualIndex != Invalid ) {
       if( VisualIndex != TopSelectedViewInteractive->CursorVisualIndex )
         VisualIndex = TopSelectedViewInteractive->CursorVisualIndex;
+      return;
     }
-    else if( VisualIndex != DefaultVisualIndex )
+
+    if( TopSelectedViewNote && TopSelectedViewNote->CursorVisualIndex != Invalid ) {
+      if( VisualIndex != TopSelectedViewNote->CursorVisualIndex )
+        VisualIndex = TopSelectedViewNote->CursorVisualIndex;
+      return;
+    }
+    
+    if( VisualIndex != DefaultVisualIndex )
       VisualIndex = DefaultVisualIndex;
   }
 
@@ -309,10 +419,6 @@ namespace NAMESPACE {
     // cursor movement range
     UpdateVisual();
     UpdateRect();
-
-    // Call loop function when the cursor is over an view interactive
-    if( TopSelectedViewInteractive && TopSelectedViewInteractive->EventLoop )
-      TopSelectedViewInteractive->EventLoop( TopSelectedViewInteractive, this );
 
     // Place cursor in
     // viewport before blit
@@ -391,7 +497,7 @@ namespace NAMESPACE {
 
     zCViewCursorVisual* visual = new zCViewCursorVisual();
     visual->InsertBack( texName );
-    visual->SetActivePoint( activePoint[VX], activePoint[VY] );
+    visual->SetActivePoint( (int)activePoint[VX], (int)activePoint[VY] );
 
     if( aniFps ) {
       visual->SetAnimationEnabled( True );
@@ -435,7 +541,7 @@ namespace NAMESPACE {
 
 
   bool_t zCViewCursor::IsLeftToggled() {
-    return LeftPressed && !LeftToggled;
+    return LeftPressed && LeftToggled;
   }
 
 
@@ -447,7 +553,7 @@ namespace NAMESPACE {
 
 
   bool_t zCViewCursor::IsMiddleToggled() {
-    return MiddlePressed && !MiddleToggled;
+    return MiddlePressed && MiddleToggled;
   }
 
 
@@ -459,7 +565,7 @@ namespace NAMESPACE {
 
 
   bool_t zCViewCursor::IsRightToggled() {
-    return RightPressed && !RightToggled;
+    return RightPressed && RightToggled;
   }
 
 
@@ -484,22 +590,22 @@ namespace NAMESPACE {
 
 
 
-  void zCViewCursor::SetTopHandleView( zCView*& view ) {
-    TopHandleView = &view;
+  void zCViewCursor::SetHandledView( zCView*& view ) {
+    HandledView = &view;
   }
 
 
 
-  zCView*& zCViewCursor::GetTopHandleView() {
-    if( TopHandleView == Null )
+  zCView*& zCViewCursor::GetHandledView() {
+    if( HandledView == Null )
       return screen;
 
-    return *TopHandleView;
+    return *HandledView;
   }
 
 
 
-  void zCViewCursor::ClearTopHandleView() {
-    TopHandleView = Null;
+  void zCViewCursor::ClearHandledView() {
+    HandledView = Null;
   }
 }

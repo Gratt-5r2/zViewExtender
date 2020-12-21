@@ -1,5 +1,42 @@
 
 namespace NAMESPACE {
+  // <FIX ME> if texture is not used in World
+  // material list, it resource can cause a
+  // crash in Cache out functions. 
+  static Array<zCTexture*>& GetAniTextureCache() {
+    static Array<zCTexture*> cache;
+    return cache;
+  }
+
+  static zCTexture* CreateAniTexture( const zSTRING& name ) {
+    auto& cache = GetAniTextureCache();
+    for each( zCTexture * tex in cache )
+      if( name == tex->objectName )
+        return tex;
+
+    zCTexture* texture = zCTexture::Load( Z name, 0 );
+    if( texture ) {
+      texture->AddRef();
+      cache += texture;
+    }
+
+    return texture;
+  }
+  // </FIX ME>
+
+
+
+
+
+
+
+
+  zCTexture* LoadAnimatedTexture( const string& texName ) {
+
+  }
+
+
+
   zCViewAnimated::zCViewAnimated() : zCView() {
     Init();
   }
@@ -54,7 +91,13 @@ namespace NAMESPACE {
 
 
   bool32 zCViewAnimated::IsOnPause() {
-    return !AniHandler->IsEnabled();
+    return AniHandler->IsPaused();
+  }
+
+
+
+  bool32 zCViewAnimated::IsPlayed() {
+    return !IsOnPause() && AnimationIsEnabled();
   }
 
 
@@ -140,14 +183,14 @@ namespace NAMESPACE {
 
 
 
-  void zCViewAnimated::SetFrame( int frame ) {
-    AniHandler->SetCurrentFrame( frame );
+  void zCViewAnimated::SetFrame( int frame, bool considerReverse ) {
+    AniHandler->SetCurrentFrame( frame, considerReverse );
   }
 
 
 
-  void zCViewAnimated::SetFrameByTime( int time ) {
-    AniHandler->SetCurrentFrame( GetFrameByTime( time ) );
+  void zCViewAnimated::SetFrameByTime( int time, bool considerReverse ) {
+    AniHandler->SetCurrentFrame( GetFrameByTime( time ), considerReverse );
   }
 
 
@@ -171,19 +214,31 @@ namespace NAMESPACE {
   }
 
 
-
   void zCViewAnimated::InsertBack( zCTexture* texture ) {
-    zCView::InsertBack( texture );
-    AniHandler->SetTexture( &texture );
+    if( !texture )
+      return;
+
+    if( backTex ) {
+      backTex->Release();
+      backTex = Null;
+    }
+
+    backTex = texture;
+    backTex->AddRef();
+
+    AniHandler->SetTexture( &backTex );
     AniHandler->ResetAnimation();
   }
 
 
 
   void zCViewAnimated::InsertBack( const zSTRING& texname ) {
-    zCView::InsertBack( texname );
-    AniHandler->SetTexture( &backTex );
-    AniHandler->ResetAnimation();
+    zCTexture* texture = CreateAniTexture( texname );
+    if( !texture )
+      return;
+
+    InsertBack( texture );
+    texture->Release();
   }
 
 

@@ -7,7 +7,33 @@ namespace NAMESPACE {
   // TO DO
   // Your code ...
 
+  
+
+  LRESULT __stdcall KeyboardProc( int code, WPARAM wParam, LPARAM lParam ) {
+    if( code == HC_ACTION ) {
+      GetInputCharacter() = 0;
+
+      switch( wParam ) {
+      case WM_KEYDOWN:
+        LPKBDLLHOOKSTRUCT kbHookData = (LPKBDLLHOOKSTRUCT)lParam;
+
+        WORD symbol = 0;
+        byte kbState[256];
+        GetKeyboardState( kbState );
+        if( ToAscii( kbHookData->vkCode, MapVirtualKey( kbHookData->vkCode, 0 ), kbState, &symbol, 0 ) != Invalid )
+          GetInputCharacter() = (char)symbol;
+
+        break;
+      }
+    }
+
+    return CallNextHookEx( 0, code, wParam, lParam );
+  }
+
+
+
   void Game_Entry() {
+    SetWindowsHookEx( WH_KEYBOARD_LL, KeyboardProc, 0, 0 );
     PATCH_EXECUTE(
       "MemSet(0x0064F1C7, '90', 0x0064F1F0 - 0x0064F1C7)"
     );
@@ -18,8 +44,8 @@ namespace NAMESPACE {
     if( !enableInMenu ) {
       Ivk_Menu_Render.Detach();
       Ivk_Menu_HandleEvent.Detach();
-      Ivk_Menu_Enter.Detach();
-      Ivk_Menu_Leave.Detach();
+      //Ivk_Menu_Enter.Detach();
+      //Ivk_Menu_Leave.Detach();
     }
 
 
@@ -47,6 +73,7 @@ namespace NAMESPACE {
     }
   }
 
+  static zCViewNote* note = Null;
   void Game_Init() {
     RECT rect;
     GetWindowRect( hWndApp, &rect );
@@ -61,6 +88,50 @@ namespace NAMESPACE {
   }
 
   void Game_Loop() {
+    return;
+    static zCViewRenderer* rnd = Null;
+    if( !rnd ) {
+      rnd = new zCViewRenderer();
+      rnd->InsertBack( "Black" );
+      rnd->InsertVisual( player );
+      screen->InsertItem( rnd );
+      rnd->SetSize( 1024, 4096 );
+      rnd->Properties.Camera.Rotation[VX] = 15.0f;
+    }
+
+    rnd->Properties.Camera.Rotation[VY] += 0.05f * ztimer->frameTimeFloat;
+
+    static zCView* grd = Null;
+    if( !grd ) {
+      grd = new zCView( 0, 0, 0, 0 );
+      grd->InsertBack( "Black_2_Alpha" );
+      rnd->InsertItem( grd );
+      grd->SetPos( 0, 4096 );
+      grd->SetSize( 8192, 4096 );
+    }
+
+
+    return;
+    static zCView* Slot = Null;
+    static zCViewInteractive* Cell1 = Null;
+    static zCViewAnimated* Cell2 = Null;
+    if( !Slot ) {
+      Slot = new zCView();
+      screen->InsertItem( Slot );
+      Slot->InsertBack( "Black" );
+      Slot->SetSize( 8192, 8192 );// zPixelX( 600 ), zPixelY( 600 ) );
+      Slot->SetPos( 0, 0 );
+
+      Cell1 = new zCViewInteractive( 0, 0, 8192, 8192 );
+      Slot->InsertItem( Cell1 );
+
+      Cell2 = new zCViewAnimated( 0, 0, 8192, 3072 );
+      //Cell2->InsertBack( "INVENTORYFOG_A0.TGA" );// "Black_2_Alpha" );
+      //Cell2->SetFps( 20 );
+      Cell2->SetAlphaBlendFunc( zRND_ALPHA_FUNC_BLEND );
+      Cell2->SetPos( 0, 8192 - 3072 );
+      Slot->InsertItem( Cell2 );
+    }
   }
 
   void Game_PostLoop() {
@@ -69,6 +140,19 @@ namespace NAMESPACE {
   }
 
   void Game_MenuLoop() {
+
+    /*if( !note ) {
+      note = new zCViewNote();
+      screen->InsertItem( note );
+      note->SetPos( 4196, 0 );
+      note->SetFont( "FONT_OLD_10_WHITE.TGA" );
+      note->EditBegin();
+      note->InsertBack( "black" );
+      note->SetSize( 3000, 3000 );
+    }*/
+
+    // note->SetHandleEventTop();
+
 #if 0
     // Test program
     InitTest();

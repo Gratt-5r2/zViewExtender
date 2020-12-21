@@ -29,6 +29,23 @@ namespace NAMESPACE {
 
 
 
+  Array<zCView*> zCView::GetTopViewList( const int& x, const int& y ) {
+    zCView* child = childs.root;
+
+    Array<zCView*> topList;
+    if( IsOnBounds( x, y ) )
+      topList += this;
+
+    while( child ) {
+      topList += child->GetTopView( x, y );
+      child = child->next;
+    }
+
+    return topList;
+  }
+
+
+
   void zCView::ShowBounds( const zCOLOR& color ) {
     screen->Line(
       zPixelX( pposx ),

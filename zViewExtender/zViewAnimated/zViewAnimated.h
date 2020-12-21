@@ -1,6 +1,6 @@
 
 namespace NAMESPACE {
-  class zCViewAnimated : public zCView {
+  class VIEWAPI zCViewAnimated : public zCView {
     zCTexAniHandler* AniHandler;
   protected:
 
@@ -18,6 +18,7 @@ namespace NAMESPACE {
     bool_t AnimationIsEnabledOnPause();
     bool_t IsLooped();
     bool_t IsOnPause();
+    bool_t IsPlayed();
     bool_t IsReversed();
     int GetFps();
     int GetSpeed();
@@ -32,8 +33,8 @@ namespace NAMESPACE {
     void SetSpeed( int speed );
     void SetLooped( bool32 looped );
     void SetReversed( bool32 reversed );
-    void SetFrame( int frame );
-    void SetFrameByTime( int time );
+    void SetFrame( int frame, bool considerReverse = true );
+    void SetFrameByTime( int time, bool considerReverse = true );
     void Play();
     void Pause();
     void Stop();

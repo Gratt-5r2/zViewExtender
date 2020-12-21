@@ -2,8 +2,10 @@
 namespace NAMESPACE {
   HOOK Ivk_Menu_Render      PATCH( &zCMenu::Render,      &zCMenu::Render_Union );
   HOOK Ivk_Menu_HandleEvent PATCH( &zCMenu::HandleEvent, &zCMenu::HandleEvent_Union );
-  HOOK Ivk_Menu_Enter       PATCH( &zCMenu::ScreenInit,  &zCMenu::ScreenInit_Union );
-  HOOK Ivk_Menu_Leave       PATCH( &zCMenu::ScreenDone,  &zCMenu::ScreenDone_Union );
+  HOOK Ivk_Menu_ScreenInit  PATCH( &zCMenu::ScreenInit,  &zCMenu::ScreenInit_Union );
+  HOOK Ivk_Menu_ScreenDone  PATCH( &zCMenu::ScreenDone,  &zCMenu::ScreenDone_Union );
+
+  static bool g_bNewMenuInited = false;
 
 
 
@@ -19,14 +21,14 @@ namespace NAMESPACE {
 
 
 
-  void zCMenu::Render_Union() {
+  void zCMenu::SelectItem() {
     zCViewCursor* cursor = zCViewCursor::GetCursor();
-
     if( cursor ) {
       static int oldx, oldy, x, y;
       cursor->GetPixelPos( x, y );
-
-      if( oldx != x || oldy != y ) {
+      
+      if( g_bNewMenuInited || oldx != x || oldy != y ) {
+        g_bNewMenuInited = false;
 
         oldx = x;
         oldy = y;
@@ -57,15 +59,18 @@ namespace NAMESPACE {
         }
       }
     }
+  }
 
+
+
+  void zCMenu::Render_Union() {
+    SelectItem();
     return THISCALL( Ivk_Menu_Render )();
   }
 
 
 
   int zCMenu::HandleEvent_Union( int key ) {
-    // cmd << key << endl;
-
     if( m_mainSel != -1 ) {
       zCViewCursor* cursor = zCViewCursor::GetCursor(); 
 
@@ -90,7 +95,6 @@ namespace NAMESPACE {
         }
       
         if( key == MOUSE_BUTTONLEFT ) {
-
           zCSoundFX* sfx = zsound->LoadSoundFX( "MOUSE_CLICK.WAV" );
           if( sfx ) {
             zsound->PlaySound( sfx, 1 );
@@ -101,15 +105,11 @@ namespace NAMESPACE {
           cursor->GetPixelPos( x, y );
           zCView* menuItem = screen->GetTopView( x, y );
       
-          if( menuItem ) {
-            for( int i = 0; i < m_listItems.GetNum(); i++ ) {
-            
-              if( GetActiveItem()->m_pInnerWindow == menuItem ) {
-                SetActiveItem( m_listItems[i] );
+          if( menuItem )
+            for( int i = 0; i < m_listItems.GetNum(); i++ )
+              if( GetActiveItem()->m_pInnerWindow == menuItem )
                 return THISCALL( Ivk_Menu_HandleEvent )( key );
-              }
-            }
-          }
+
           return True;
         }
 
@@ -131,19 +131,20 @@ namespace NAMESPACE {
 
   void zCMenu::ScreenInit_Union() {
     bool_t thisMenuIsMain = name == "MENU_MAIN";
+    g_bNewMenuInited = true;
 
     if( thisMenuIsMain && s_lastMenuIsMain )
       zCViewCursor::GetCursor()->ShowAtCenter();
     else
       zCViewCursor::GetCursor()->Show();
 
-    THISCALL( Ivk_Menu_Enter )();
+    THISCALL( Ivk_Menu_ScreenInit )();
   }
 
 
 
   void zCMenu::ScreenDone_Union() {
-    THISCALL( Ivk_Menu_Leave )();
+    THISCALL( Ivk_Menu_ScreenDone )();
     zCViewCursor::GetCursor()->Hide();
     
     s_lastMenuIsMain = name == "MENU_MAIN";
